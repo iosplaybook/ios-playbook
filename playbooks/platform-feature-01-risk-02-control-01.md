@@ -194,4 +194,4 @@ This control detects IPA repackaging locally, but a determined attacker may stil
 - [https://developer.apple.com/documentation/cryptokit](https://developer.apple.com/documentation/cryptokit)
 - [https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/MachOTopics/](https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/MachOTopics/)
 
-The source code with the implemented control can be found [here](implemented_controls/platform-feature-01-risk-0-control-01.zip).
+The source code with the implemented control can be found [here](implemented_controls/platform-feature-01-risk-02-control-01.zip).

@@ -1,10 +1,10 @@
 ## platform-feature-01-risk-02
 
-### Description
+### Title
 
 Repackage the IPA
 
-### Goal
+### Description
 
 Attackers could make permanent modifications to IPAs to avoid being detected. (MITRE ATT&CK: ***Defence Evasion*** - TA0030).
 ### Demonstration

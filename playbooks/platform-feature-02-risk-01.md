@@ -2,11 +2,13 @@
 
 ### Title
 
-Inspect HTTPs traffic
+Inspect HTTPS traffic
 
 ### Description
 
-Inspect HTTPS traffic by routing app network communications through a trusted interception proxy to monitor data transmitted between the app and its endpoints (MITRE ATT&CK: ***Collection*** - TA0035).
+Inspect HTTPS traffic by routing app network communications through a locally trusted interception proxy (MITRE ATT&CK: ***Collection*** - TA0035). 
+
+A finding means matching HTTPS traffic was decrypted through the interception CA, so no effective certificate or public-key pinning was observed for that exchange. Installing and trusting the CA is a test prerequisite, not itself a vulnerability, and the finding does not mean HTTPS is broken.
 
 ### Demonstration
 #### 01. Prepare the environment
@@ -91,9 +93,9 @@ After installing the certificate profile, open `Settings > General > About > Ce
 
 <img src="attachments/feature2_ss14.png" width="400" alt="Alt text">
 
-#### 09. Check HTTPs traffic in Burp
+#### 09. Check HTTPS traffic in Burp
 
-Launch the target app on the iPhone and use the features to be tested. In Burp Suite, go to `Proxy > HTTP history` and turn off Intercept to allow the app to run without interruption. Verify that Burp Suite captures the app's `HTTP` and `HTTPS` traffic.
+Launch the target app on the iPhone and use the features to be tested. In Burp Suite, go to `Proxy > HTTP history` and turn off Intercept to allow the app to run without interruption. Verify that matching `HTTPS` requests and completed responses are visible in decrypted form. Plain `HTTP` traffic is not equivalent evidence for this TLS interception test. Do not retain raw headers, cookies, authorization values, request bodies, or response bodies as report evidence.
 
 <img src="attachments/feature2_risk1_ss1.png" width="400" alt="Alt text">
 
