@@ -2,7 +2,7 @@
 
 ### Title
 
-Retrieve an IPA
+Retrieve an IPA via Apple Configurator
 
 ### Description
 
