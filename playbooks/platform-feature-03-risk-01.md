@@ -18,7 +18,7 @@ Set up the required environment with:
 
 #### 02. Install screen recording app
 
-Install the screen recording app on the iPhone. Use Xcode to open the [feature4-replay_consent_recorder](https://github.com/zhiyi-school/iosplaybook_sideload/tree/main/feature4) project, then build and run the app on the iPhone. 
+Install the screen recording app on the iPhone. Use Xcode to open the [feature3-replay_consent_recorder](https://github.com/zhiyi-school/iosplaybook_sideload/tree/main/ScreenRecording) project, then build and run the app on the iPhone. 
 
 ``` swift
 // Opens Apple's screen-recording consent picker
