@@ -1,4 +1,4 @@
-## platform-feature-02-risk-01-control-01
+## ios-platform-feature-02-risk-01-control-01
 
 ### Title
 
@@ -36,7 +36,7 @@ guard isEnabled(settings[enabledKey]) else {
 
 *Code block shows source code for proxy configuration check*
 
-<img src="attachments/feature2_risk1_control1_ss3.png" width="400" alt="Alt text">
+<img src="assets/feature2_risk1_control1_ss3.png" width="400" alt="Alt text">
 
 *Screenshot shows warning to user that proxy is configured*
 
@@ -44,4 +44,4 @@ guard isEnabled(settings[enabledKey]) else {
 
 - https://developer.apple.com/documentation/cfnetwork/cfnetworkcopysystemproxysettings()
 
-The source code with the implemented control can be found [here](implemented_controls/platform-feature-02-risk-01-control-01.zip).
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-02-risk-01-control-01.zip).

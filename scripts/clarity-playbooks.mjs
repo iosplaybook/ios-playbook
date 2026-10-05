@@ -346,7 +346,7 @@ function isIgnoredHeading(trimmed) {
     return true;
   }
 
-  return /^## platform-feature-(0[1-9]|[1-9][0-9])(?:-risk-(0[1-9]|[1-9][0-9]))?(?:-control-(0[1-9]|[1-9][0-9]))?$/.test(trimmed);
+  return /^## ios-platform-feature-(0[1-9]|[1-9][0-9])(?:-risk-(0[1-9]|[1-9][0-9]))?(?:-control-(0[1-9]|[1-9][0-9]))?$/.test(trimmed);
 }
 
 function isIgnoredTemplateLine(trimmed) {
@@ -493,15 +493,15 @@ async function safeReadResponseText(response) {
 }
 
 function inferTypeFromFilename(basename) {
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "control";
   }
 
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "risk";
   }
 
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "feature";
   }
 

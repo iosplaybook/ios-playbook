@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { buildClarityPrompts, extractClarityContent, normalizeModelResponse } from "./clarity-playbooks.mjs";
 
 test("buildClarityPrompts gives feature-specific guidance", () => {
-  const prompts = buildClarityPrompts("playbooks/platform-feature-01.md", "feature", "3: demo");
+  const prompts = buildClarityPrompts("playbooks/ios-platform-feature-01.md", "feature", "3: demo");
 
   assert.match(prompts.system, /reviewing a feature playbook/i);
   assert.match(prompts.system, /ignore the trailing template word 'feature'/i);
@@ -15,7 +15,7 @@ test("buildClarityPrompts gives feature-specific guidance", () => {
 });
 
 test("buildClarityPrompts gives risk-specific guidance", () => {
-  const prompts = buildClarityPrompts("playbooks/platform-feature-01-risk-01.md", "risk", "12: demo");
+  const prompts = buildClarityPrompts("playbooks/ios-platform-feature-01-risk-01.md", "risk", "12: demo");
 
   assert.match(prompts.system, /reviewing a risk playbook/i);
   assert.match(prompts.system, /Open X to do Y/i);
@@ -25,7 +25,7 @@ test("buildClarityPrompts gives risk-specific guidance", () => {
 });
 
 test("buildClarityPrompts gives control-specific guidance", () => {
-  const prompts = buildClarityPrompts("playbooks/platform-feature-01-risk-01-control-01.md", "control", "3: demo");
+  const prompts = buildClarityPrompts("playbooks/ios-platform-feature-01-risk-01-control-01.md", "control", "3: demo");
 
   assert.match(prompts.system, /reviewing a control playbook/i);
   assert.match(prompts.system, /preserve the original step intent/i);
@@ -49,14 +49,14 @@ test("normalizeModelResponse accepts a valid advisory finding", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 4,
       severity: "advisory",
       category: "ambiguity",
@@ -80,14 +80,14 @@ test("normalizeModelResponse accepts a feature-name advisory finding", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 3,
       severity: "advisory",
       category: "feature_name",
@@ -111,14 +111,14 @@ test("normalizeModelResponse accepts an action-oriented demonstration finding", 
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 12,
       severity: "advisory",
       category: "step_action",
@@ -142,14 +142,14 @@ test("normalizeModelResponse accepts an action-oriented risk demonstration findi
         },
       ],
     }),
-    "playbooks/platform-feature-01-risk-01.md",
+    "playbooks/ios-platform-feature-01-risk-01.md",
     14
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01-risk-01.md",
+      file: "playbooks/ios-platform-feature-01-risk-01.md",
       line: 12,
       severity: "advisory",
       category: "step_action",
@@ -179,14 +179,14 @@ test("normalizeModelResponse accepts a control-step rewrite finding", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01-risk-01-control-01.md",
+    "playbooks/ios-platform-feature-01-risk-01-control-01.md",
     6
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01-risk-01-control-01.md",
+      file: "playbooks/ios-platform-feature-01-risk-01-control-01.md",
       line: 3,
       severity: "advisory",
       category: "step_action",
@@ -195,7 +195,7 @@ test("normalizeModelResponse accepts a control-step rewrite finding", () => {
       suggestedRewrite: "1. Detect exported backup files by scanning the app data directory before processing secrets",
     },
     {
-      file: "playbooks/platform-feature-01-risk-01-control-01.md",
+      file: "playbooks/ios-platform-feature-01-risk-01-control-01.md",
       line: 4,
       severity: "advisory",
       category: "step_action",
@@ -219,9 +219,9 @@ test("normalizeModelResponse includes source text when original lines are availa
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -241,7 +241,7 @@ test("normalizeModelResponse includes source text when original lines are availa
 });
 
 test("normalizeModelResponse rejects malformed JSON", () => {
-  const result = normalizeModelResponse("{not json}", "playbooks/platform-feature-01.md", 12);
+  const result = normalizeModelResponse("{not json}", "playbooks/ios-platform-feature-01.md", 12);
 
   assert.equal(result.findings.length, 0);
   assert.match(result.error, /not valid JSON/i);
@@ -250,7 +250,7 @@ test("normalizeModelResponse rejects malformed JSON", () => {
 test("normalizeModelResponse rejects a response without findings", () => {
   const result = normalizeModelResponse(
     JSON.stringify({ summary: "Missing findings array." }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -271,7 +271,7 @@ test("normalizeModelResponse rejects out-of-range line numbers", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -280,7 +280,7 @@ test("normalizeModelResponse rejects out-of-range line numbers", () => {
 });
 
 test("extractClarityContent excludes template headings, fixed template lines, and Markdown tables", () => {
-  const content = extractClarityContent(`## platform-feature-01
+  const content = extractClarityContent(`## ios-platform-feature-01
 ### Description
 The iOS platform provides Secure Storage feature.
 ### Additional context
@@ -303,7 +303,7 @@ Perform the following steps to enable Secure Storage:
 });
 
 test("extractClarityContent ignores fenced Markdown code blocks", () => {
-  const content = extractClarityContent(`## platform-feature-01
+  const content = extractClarityContent(`## ios-platform-feature-01
 ### Description
 The iOS platform provides Secure Storage feature.
 

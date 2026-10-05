@@ -132,7 +132,7 @@ function validateStructure(filePath, lines, passLogs) {
         1,
         "filename.scheme",
         `The filename '${basename}.md' does not follow an approved playbook naming pattern, so the validator cannot determine which public template to apply.`,
-        "Rename the file to one of the approved patterns: 'platform-feature-01.md', 'platform-feature-01-risk-01.md', or 'platform-feature-01-risk-01-control-01.md'. Each numbered placeholder must use two digits from 01 to 99."
+        "Rename the file to one of the approved patterns: 'ios-platform-feature-01.md', 'ios-platform-feature-01-risk-01.md', or 'ios-platform-feature-01-risk-01-control-01.md'. Each numbered placeholder must use two digits from 01 to 99."
       ),
     ];
   }
@@ -174,9 +174,9 @@ function validateFeatureFile(filePath, basename, items, passLogs) {
   // A mismatch in any required section is a failure because the document would
   // no longer follow the agreed public template.
   const heading = state.expect(
-    /^## (platform-feature-(0[1-9]|[1-9][0-9]))$/,
+    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9]))$/,
     "feature.heading",
-    "The feature heading must be written exactly as '## platform-feature-01', where '01' is replaced with a two-digit value from 01 to 99."
+    "The feature heading must be written exactly as '## ios-platform-feature-01', where '01' is replaced with a two-digit value from 01 to 99."
   );
 
   const headingSlug = heading?.match[1] ?? null;
@@ -279,9 +279,9 @@ function validateFeatureFile(filePath, basename, items, passLogs) {
   }
 
   state.expectBulletList(
-    /^- \[(platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))\]\((platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])\.md)\)$/,
+    /^- \[(ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))\]\((ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])\.md)\)$/,
     "feature.related_risks_list",
-    "Each related risk entry must follow the approved format '- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)'.",
+    "Each related risk entry must follow the approved format '- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)'.",
     ({ item, match, parser }) => {
       const riskId = match[1];
       const linkedFile = match[4];
@@ -310,9 +310,9 @@ function validateRiskFile(filePath, basename, items, passLogs) {
   // harmful outcome that misuse could create. These checks keep that story
   // complete, consistent, and easy to compare across many playbooks.
   const heading = state.expect(
-    /^## (platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))$/,
+    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))$/,
     "risk.heading",
-    "The risk heading must be written exactly as '## platform-feature-01-risk-01', where each numbered placeholder uses a two-digit value from 01 to 99."
+    "The risk heading must be written exactly as '## ios-platform-feature-01-risk-01', where each numbered placeholder uses a two-digit value from 01 to 99."
   );
 
   const headingSlug = heading?.match[1] ?? null;
@@ -407,9 +407,9 @@ function validateControlFile(filePath, basename, items, passLogs) {
   // provide a detection step, provide a prevention step, and point to the APK
   // that demonstrates the control. Anything missing becomes a failure.
   const heading = state.expect(
-    /^## (platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9]))$/,
+    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9]))$/,
     "control.heading",
-    "The control heading must be written exactly as '## platform-feature-01-risk-01-control-01', where each numbered placeholder uses a two-digit value from 01 to 99."
+    "The control heading must be written exactly as '## ios-platform-feature-01-risk-01-control-01', where each numbered placeholder uses a two-digit value from 01 to 99."
   );
 
   const headingSlug = heading?.match[1] ?? null;
@@ -690,15 +690,15 @@ function createParser(filePath, items, passLogs) {
 function inferTypeFromFilename(basename) {
   // Filename classification is strict because the filename determines which
   // public template will be enforced next.
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "control";
   }
 
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "risk";
   }
 
-  if (/^platform-feature-(0[1-9]|[1-9][0-9])$/.test(basename)) {
+  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])$/.test(basename)) {
     return "feature";
   }
 

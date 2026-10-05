@@ -1,4 +1,4 @@
-## platform-feature-01
+## ios-platform-feature-01
 ### Description
 The iOS platform provides {feature_name} feature.
 ### Additional context

@@ -1,4 +1,4 @@
-## platform-feature-01-risk-02-control-02
+## ios-platform-feature-01-risk-02-control-02
 
 ### Description
 
@@ -111,4 +111,4 @@ _Code block shows the application response when the signing-identity check fails
 - [https://developer.apple.com/documentation/security/sharing-access-to-keychain-items-among-a-collection-of-apps](https://developer.apple.com/documentation/security/sharing-access-to-keychain-items-among-a-collection-of-apps)
 - [https://developer.apple.com/documentation/devicecheck/dcappattestservice](https://developer.apple.com/documentation/devicecheck/dcappattestservice)
 
-The source code with the implemented control can be found [here](implemented_controls/platform-feature-01-risk-02-control-02.zip).
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-01-risk-02-control-02.zip).

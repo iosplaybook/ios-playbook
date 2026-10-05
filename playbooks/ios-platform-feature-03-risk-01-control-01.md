@@ -1,4 +1,4 @@
-## platform-feature-03-risk-01-control-01
+## ios-platform-feature-03-risk-01-control-01
 
 ### Title
 
@@ -23,4 +23,4 @@ SecureField("Password", text: $password)
 References:
 - [https://medium.com/@lakshimi.cg/screenshot-prevention-in-ios-f059dc82b046](https://medium.com/@lakshimi.cg/screenshot-prevention-in-ios-f059dc82b046)
 
-The source code with the implemented control can be found [here](implemented_controls/platform-feature-03-risk-01-control-01.zip).
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-03-risk-01-control-01.zip).

@@ -1,4 +1,4 @@
-## platform-feature-01
+## ios-platform-feature-01
 ### Description
 The iOS platform provides Secure Storage feature.
 ### Additional context

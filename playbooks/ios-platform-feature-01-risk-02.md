@@ -1,4 +1,4 @@
-## platform-feature-01-risk-02
+## ios-platform-feature-01-risk-02
 
 ### Title
 
@@ -26,19 +26,19 @@ Sign in to the same Apple ID on both the physical iOS device and the macOS works
 
 Connect the iPhone to the macOS workstation and open Apple Configurator. Select the connected device, open the Apps tab, click Add, and search for the target app. Adding the app causes Apple Configurator to download the current production package from Apple's servers and temporarily store it in the local cache.
 
-<img src="attachments/feature1_ss1_apple_config.png" width="500" alt="Alt text">
+<img src="assets/feature1_ss1_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows connected device in Apple Configurator._
 
-<img src="attachments/feature1_ss2_apple_config.png" width="500" alt="Alt text">
+<img src="assets/feature1_ss2_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows the_ `_Apps_` _tab on the connected device._
 
-<img src="attachments/feature1_ss3_apple_config.png" width="500" alt="Alt text">
+<img src="assets/feature1_ss3_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows the_ `_+ > Apps_` _selection in Apple Configurator._
 
-<img src="attachments/feature1_ss4_apple_config.png" width="500" alt="Alt text">
+<img src="assets/feature1_ss4_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows the list of available apps._
 
@@ -50,7 +50,7 @@ On the macOS workstation, open Terminal and navigate to the Apple Configurator t
 ~/Library/Group\ Containers/K36BKF7T3D.group.com.apple.configurator/Library/Caches/Assets/TemporaryItems/MobileApps/
 ```
 
-<img src="attachments/feature1_ss5_apple_config.png" width="500" alt="Alt text">
+<img src="assets/feature1_ss5_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows the target app IPA in the Apple Configurator cache directory._
 
@@ -60,7 +60,6 @@ Use Apple's unzip utility to extract the newly created IPA into a working direct
 
 ``` shell
 unzip <TARGET_APP>.ipa -d patched-ipa
-
 ```
 
 #### 06. Download Frida Gadget   
@@ -98,19 +97,31 @@ insert_dylib --strip-codesig --inplace "@executable_path/Frameworks/FridaGadget.
 Re-sign all executable code in the modified app bundle, including `FridaGadget.dylib`, using the macOS `codesign` utility with a valid Apple Development signing identity and compatible entitlements.
 
 ``` shell
-mkdir -p dist
-cd patched-ipa
-zip -qry ../dist/TargetApp-frida.ipa Payload
-cd ..
+ls ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/
 
+cp <PROFILE>.mobileprovision patched-ipa/Payload/TargetApp.app/embedded.mobileprovision
+
+security cms -D -i <PROFILE>.mobileprovision > profile.plist
+/usr/libexec/PlistBuddy -x -c 'Print :Entitlements' profile.plist > entitlements.plist
+```
+
+*Code block shows commands to obtain provisioning profile and embed it to allow for resigning.*
+
+``` shell
 codesign --force --sign "<SIGNING_IDENTITY>" \
   patched-ipa/Payload/TargetApp.app/Frameworks/FridaGadget.dylib
 
 codesign --force --sign "<SIGNING_IDENTITY>" \
   --entitlements entitlements.plist \
   patched-ipa/Payload/TargetApp.app
+  
+mkdir -p dist
+cd patched-ipa
+zip -qry ../dist/TargetApp-frida.ipa Payload
+cd ..
 ```
 
+*Code block shows commands used to resign and repackage IPA.*
 #### 09. Install the app 
 
 Use Apple's `devicectl` utility to note the `UDID` of the connected iPhone and install the signed `.app` bundle onto it.
@@ -121,7 +132,7 @@ xcrun devicectl device install app \
   patched-ipa/Payload/TargetApp.app
 ```
 
-*Code block shows commands used to resign and reinstall repackaged IPA.*
+*Code block shows commands used to reinstall repackaged IPA.*
 
 #### 10. Connect to Frida
 
@@ -135,8 +146,8 @@ frida -U -n Gadget -l <FRIDA_SCRIPT>
 
 Feature-01-Risk-02 control measures:
 
-- [platform-feature-01-risk-02-control-01](app://-/platform-feature-01-risk-02-control-01.md)
-- [platform-feature-01-risk-02-control-02](app://-/platform-feature-01-risk-02-control-02.md)
+- [ios-platform-feature-01-risk-02-control-01](app://-/ios-platform-feature-01-risk-02-control-01.md)
+- [ios-platform-feature-01-risk-02-control-02](app://-/ios-platform-feature-01-risk-02-control-02.md)
 
 References:
 

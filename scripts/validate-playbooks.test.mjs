@@ -10,12 +10,12 @@ const scriptPath = path.join(repoRoot, "scripts", "validate-playbooks.mjs");
 
 test("feature playbooks accept a post-demonstration related risks section", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -39,7 +39,7 @@ test("feature playbooks accept a post-demonstration related risks section", () =
       "",
       "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
       "",
     ].join("\n"),
     "utf8"
@@ -56,12 +56,12 @@ test("feature playbooks accept a post-demonstration related risks section", () =
 
 test("required table structure accepts two rows and proceeds to the next feature check", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -84,7 +84,7 @@ test("required table structure accepts two rows and proceeds to the next feature
       "",
       "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
       "",
     ].join("\n"),
     "utf8"
@@ -103,12 +103,12 @@ test("required table structure accepts two rows and proceeds to the next feature
 
 test("each numbered demonstration step is validated for a feature playbook", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -132,7 +132,7 @@ test("each numbered demonstration step is validated for a feature playbook", () 
       "",
       "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
       "",
     ].join("\n"),
     "utf8"
@@ -149,12 +149,12 @@ test("each numbered demonstration step is validated for a feature playbook", () 
 
 test("feature playbooks allow image lines between numbered demonstration steps", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -175,13 +175,13 @@ test("feature playbooks allow image lines between numbered demonstration steps",
       "",
       "1. Open the project settings to enable encrypted storage",
       "",
-      "<img src=\"../attachments/feature-step-1.png\" width=\"400\" alt=\"Alt text\">",
+      "<img src=\"../assets/feature-step-1.png\" width=\"400\" alt=\"Alt text\">",
       "",
       "2. Update the app configuration to store secrets in the encrypted container",
       "",
       "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
       "",
     ].join("\n"),
     "utf8"
@@ -198,12 +198,12 @@ test("feature playbooks allow image lines between numbered demonstration steps",
 
 test("the validator reports multiple feature issues from one file", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -223,7 +223,7 @@ test("the validator reports multiple feature issues from one file", () => {
       "",
       "Because the iOS platform provides Wrong Name feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-02.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-02.md)",
       "",
     ].join("\n"),
     "utf8"
@@ -244,12 +244,12 @@ test("the validator reports multiple feature issues from one file", () => {
 
 test("control playbooks accept multiple numbered steps", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01-risk-01-control-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01-control-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01-risk-01-control-01",
+      "## ios-platform-feature-01-risk-01-control-01",
       "",
       "Your app can prevent the risk of an attacker extracting secrets by taking the following steps:",
       "",
@@ -281,12 +281,12 @@ test("control playbooks accept multiple numbered steps", () => {
 
 test("risk playbooks allow additional content after the numbered demonstration steps", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01-risk-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01-risk-01",
+      "## ios-platform-feature-01-risk-01",
       "",
       "### Description",
       "",
@@ -326,12 +326,12 @@ test("risk playbooks allow additional content after the numbered demonstration s
 
 test("risk playbooks allow image lines between numbered demonstration steps", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01-risk-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01-risk-01",
+      "## ios-platform-feature-01-risk-01",
       "",
       "### Description",
       "",
@@ -353,7 +353,7 @@ test("risk playbooks allow image lines between numbered demonstration steps", ()
       "",
       "1. Open the backup directory to locate the exported application data",
       "",
-      "<img src=\"../attachments/risk-step-1.png\" width=\"400\" alt=\"Alt text\">",
+      "<img src=\"../assets/risk-step-1.png\" width=\"400\" alt=\"Alt text\">",
       "",
       "2. Inspect the exported bundle to identify embedded secrets",
       "",
@@ -372,12 +372,12 @@ test("risk playbooks allow image lines between numbered demonstration steps", ()
 
 test("risk goal sentences allow emphasized tactics with a short explanation", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01-risk-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01-risk-01",
+      "## ios-platform-feature-01-risk-01",
       "",
       "### Description",
       "",
@@ -413,15 +413,15 @@ test("risk goal sentences allow emphasized tactics with a short explanation", ()
 
 test("format checks ignore fenced Markdown code blocks", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "platform-feature-01.md");
-  const linkedRiskPath = path.join(tempRoot, "platform-feature-01-risk-01.md");
+  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
+  const linkedRiskPath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
 
   fs.writeFileSync(linkedRiskPath, "# placeholder\n", "utf8");
 
   fs.writeFileSync(
     filePath,
     [
-      "## platform-feature-01",
+      "## ios-platform-feature-01",
       "",
       "### Description",
       "",
@@ -451,7 +451,7 @@ test("format checks ignore fenced Markdown code blocks", () => {
       "",
       "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
       "",
-      "- [platform-feature-01-risk-01](platform-feature-01-risk-01.md)",
+      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
       "",
     ].join("\n"),
     "utf8"

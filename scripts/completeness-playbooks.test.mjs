@@ -9,7 +9,7 @@ import {
 } from "./completeness-playbooks.mjs";
 
 test("buildCompletenessPrompts gives feature-specific guidance", () => {
-  const prompts = buildCompletenessPrompts("playbooks/platform-feature-01.md", "feature", "12: 1. Step");
+  const prompts = buildCompletenessPrompts("playbooks/ios-platform-feature-01.md", "feature", "12: 1. Step");
 
   assert.match(prompts.system, /experienced iOS software engineer/i);
   assert.match(prompts.system, /feature flow/i);
@@ -18,7 +18,7 @@ test("buildCompletenessPrompts gives feature-specific guidance", () => {
 });
 
 test("buildCompletenessPrompts gives risk-specific guidance", () => {
-  const prompts = buildCompletenessPrompts("playbooks/platform-feature-01-risk-01.md", "risk", "12: 1. Step");
+  const prompts = buildCompletenessPrompts("playbooks/ios-platform-feature-01-risk-01.md", "risk", "12: 1. Step");
 
   assert.match(prompts.system, /experienced iOS security engineer/i);
   assert.match(prompts.system, /attacker perspective/i);
@@ -26,7 +26,7 @@ test("buildCompletenessPrompts gives risk-specific guidance", () => {
 });
 
 test("buildCompletenessPrompts gives control-specific guidance", () => {
-  const prompts = buildCompletenessPrompts("playbooks/platform-feature-01-risk-01-control-01.md", "control", "12: 1. Step");
+  const prompts = buildCompletenessPrompts("playbooks/ios-platform-feature-01-risk-01-control-01.md", "control", "12: 1. Step");
 
   assert.match(prompts.system, /defender mindset/i);
   assert.match(prompts.system, /defender perspective/i);
@@ -47,14 +47,14 @@ test("normalizeModelResponse accepts a valid incorrect-claim finding", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 6,
       severity: "advisory",
       category: "step_review",
@@ -78,14 +78,14 @@ test("normalizeModelResponse accepts a second valid step review finding", () => 
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 6,
       severity: "advisory",
       category: "step_review",
@@ -110,14 +110,14 @@ test("normalizeModelResponse strips duplicated framing from model output", () =>
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
   assert.equal(result.error, null);
   assert.deepEqual(result.findings, [
     {
-      file: "playbooks/platform-feature-01.md",
+      file: "playbooks/ios-platform-feature-01.md",
       line: 6,
       severity: "advisory",
       category: "step_review",
@@ -129,7 +129,7 @@ test("normalizeModelResponse strips duplicated framing from model output", () =>
 });
 
 test("normalizeModelResponse rejects malformed JSON", () => {
-  const result = normalizeModelResponse("{not json}", "playbooks/platform-feature-01.md", 12);
+  const result = normalizeModelResponse("{not json}", "playbooks/ios-platform-feature-01.md", 12);
 
   assert.equal(result.findings.length, 0);
   assert.match(result.error, /not valid JSON/i);
@@ -148,7 +148,7 @@ test("normalizeModelResponse rejects unknown categories", () => {
       ],
       overallUnderstanding: "The sequence appears to describe a feature workflow.",
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -169,7 +169,7 @@ test("normalizeModelResponse rejects out-of-range line numbers", () => {
       ],
       overallUnderstanding: "The sequence appears to configure a storage mechanism.",
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -190,7 +190,7 @@ test("normalizeModelResponse rejects findings without understanding", () => {
       ],
       overallUnderstanding: "",
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -211,7 +211,7 @@ test("normalizeModelResponse rejects findings without improvement", () => {
         },
       ],
     }),
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     12
   );
 
@@ -220,7 +220,7 @@ test("normalizeModelResponse rejects findings without improvement", () => {
 });
 
 test("extractCompletenessContent preserves original line numbers and keeps only numbered steps", () => {
-  const content = extractCompletenessContent(`## platform-feature-01
+  const content = extractCompletenessContent(`## ios-platform-feature-01
 ### Description
 The iOS platform provides Secure Storage feature.
 ### Additional context
@@ -243,7 +243,7 @@ Perform the following steps to enable Secure Storage:
 });
 
 test("extractCompletenessContent ignores fenced Markdown code blocks", () => {
-  const content = extractCompletenessContent(`## platform-feature-01
+  const content = extractCompletenessContent(`## ios-platform-feature-01
 ### Demonstration
 \`\`\`md
 1. Ignore this code sample step
@@ -256,10 +256,10 @@ test("extractCompletenessContent ignores fenced Markdown code blocks", () => {
 
 test("collectStaticCompletenessFindings warns when a control step does not start with Detect or Prevent", () => {
   const findings = collectStaticCompletenessFindings(
-    "playbooks/platform-feature-01-risk-01-control-01.md",
+    "playbooks/ios-platform-feature-01-risk-01-control-01.md",
     "control",
     [
-      "## platform-feature-01-risk-01-control-01",
+      "## ios-platform-feature-01-risk-01-control-01",
       "Your app can prevent the risk of an attacker extracting secrets by taking the following steps:",
       "1. Move hardcoded credentials into confidential storage",
       "2. Prevent secret exposure by using device-bound encryption",
@@ -268,7 +268,7 @@ test("collectStaticCompletenessFindings warns when a control step does not start
 
   assert.deepEqual(findings, [
     {
-      file: "playbooks/platform-feature-01-risk-01-control-01.md",
+      file: "playbooks/ios-platform-feature-01-risk-01-control-01.md",
       line: 3,
       severity: "advisory",
       category: "demo_inconsistency",
@@ -281,7 +281,7 @@ test("collectStaticCompletenessFindings warns when a control step does not start
 
 test("collectStaticCompletenessFindings ignores non-control files and compliant control steps", () => {
   const controlFindings = collectStaticCompletenessFindings(
-    "playbooks/platform-feature-01-risk-01-control-01.md",
+    "playbooks/ios-platform-feature-01-risk-01-control-01.md",
     "control",
     [
       "1. Detect hardcoded credentials by scanning the Swift source files",
@@ -289,7 +289,7 @@ test("collectStaticCompletenessFindings ignores non-control files and compliant 
     ]
   );
   const featureFindings = collectStaticCompletenessFindings(
-    "playbooks/platform-feature-01.md",
+    "playbooks/ios-platform-feature-01.md",
     "feature",
     ["1. Open the project settings to enable encrypted storage"]
   );

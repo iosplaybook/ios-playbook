@@ -138,7 +138,7 @@ To simplify parsing, the implementation should normalize both variants into a co
 
 ```json
 {
-  "file": "playbooks/platform-feature-01.md",
+  "file": "playbooks/ios-platform-feature-01.md",
   "line": 12,
   "severity": "advisory",
   "category": "missing_prerequisite",
