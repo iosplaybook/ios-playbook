@@ -31,7 +31,9 @@ Set up the Swift Confidential build plugin in Xcode. This allows the plugin to a
 
 #### 02. Specify plaintext literals for obfuscation
 
-Move plaintext literals to `confidential.yml`. This allows the plugin to generate obfuscated Swift accessors for those literals during the build. Note: The `confidential.yml` file should not be built into the app bundle.
+Move plaintext literals to `confidential.yml`. This allows the plugin to generate obfuscated Swift accessors for those literals during the build. 
+
+> Note: The `confidential.yml` file should not be built into the app bundle.
 
 ``` env
 secrets:
@@ -54,7 +56,9 @@ let api_key = Secrets.$apiKey
 
 #### 04. Verify plaintext literals are obfuscated
 
-Rebuild the app and use a static analysis tool, such as MobSF, to verify that the original plaintext literals are no longer easily recoverable from the `.ipa` file. Note: Swift Confidential prevents easy static extraction but not runtime attacks such as hooking, memory dumping, or patching.
+Rebuild the app and use a static analysis tool, such as MobSF, to verify that the original plaintext literals are no longer easily recoverable from the `.ipa` file. 
+
+> Note: Swift Confidential prevents easy static extraction but not runtime attacks such as hooking, memory dumping, or patching.
 
 ### References
 

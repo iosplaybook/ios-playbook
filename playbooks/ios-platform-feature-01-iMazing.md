@@ -31,7 +31,9 @@ Connect the iPhone to the macOS workstation and open iMazing. Select `Devices`, 
 
 #### 04. Install the IPA
 
-On iMazing, install the app that you intend to export. This can be done through the `Manage Apps` section. `Manage Apps` lists the apps installed on the connected iPhone and provides access to the installation and export options. Note: wait for the installation to complete before you continue.
+On iMazing, install the app that you intend to export. This can be done through the `Manage Apps` section. `Manage Apps` lists the apps installed on the connected iPhone and provides access to the installation and export options. 
+
+> Note: wait for the installation to complete before you continue.
 
 <img src="assets/feature1_ss2_imazing.png" width="500" alt="Alt text">
 

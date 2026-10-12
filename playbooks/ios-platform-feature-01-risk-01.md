@@ -6,7 +6,7 @@ Analyse the IPA
 
 ### Description
 
-Analyse the IPA using static analysis tools to identify sensitive plaintext information, such as hardcoded credentials, API keys, URLs, and configuration values (MITRE ATT&CK: ***Discovery*** - TA0032).
+Analyse the IPA using static analysis tools to identify sensitive plaintext information, such as hardcoded credentials, API keys, URLs, and configuration values in the application (MITRE ATT&CK: ***Discovery*** - TA0032).
 
 ### Demonstration
 
@@ -56,7 +56,7 @@ On the macOS workstation, open Terminal and navigate to the Apple Configurator t
 
 #### 05. Analyse the IPA
 
-Upload the .ipa file to MobSF and review the static analysis report for the app's overall security score, configuration issues, and sensitive information, such as hardcoded keys, embedded URLs, and other exposed data.
+Upload the `.ipa` file to MobSF and review the static analysis report for the app's overall security score, configuration issues, and sensitive information, such as hardcoded keys, embedded URLs, and other exposed data.
 
 <img src="assets/feature1_risk1_ss1.png" width="400" alt="Alt text">
 

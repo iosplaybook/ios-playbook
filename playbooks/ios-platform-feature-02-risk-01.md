@@ -57,7 +57,9 @@ On the iPhone, go to `Settings > Wi-Fi` and tap the `(i)` icon next to the conne
 
 #### 06. Get Burp cert for iPhone
 
-Open a web browser on the iPhone and navigate to `http://burp/` while the Burp proxy is configured. Download the Burp Suite CA certificate. The certificate allows Burp Suite to inspect `HTTPS` traffic from applications that trust the installed CA certificate. Note: Apps that use certificate pinning may reject Burp's certificates and prevent `HTTPS` traffic inspection.
+Open a web browser on the iPhone and navigate to `http://burp/` while the Burp proxy is configured. Download the Burp Suite CA certificate. The certificate allows Burp Suite to inspect `HTTPS` traffic from applications that trust the installed CA certificate. 
+
+> Note: Apps that use certificate pinning may reject Burp's certificates and prevent `HTTPS` traffic inspection.
 
 <img src="assets/feature2_ss8.png" width="400" alt="Alt text">
 
