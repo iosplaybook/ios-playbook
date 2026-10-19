@@ -1,0 +1,3768 @@
+{
+  "version": "2.6.2",
+  "summary": {
+    "title": "ios playbook",
+    "owner": "",
+    "description": "STRIDE threat model of the external iOS playbook (playbooks/ios-platform-feature-*.md). \nOne diagram per platform-feature risk; threats map to the playbook risks and their mitigations to the playbook controls.",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "ios-platform-feature-01-risk-01",
+        "diagramType": "STRIDE",
+        "placeholder": "New STRIDE diagram description",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": [
+          {
+            "position": {
+              "x": 42,
+              "y": 80
+            },
+            "size": {
+              "width": 308,
+              "height": 180
+            },
+            "attrs": {
+              "label": {
+                "text": "Apple distribution"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "e8e7f5a7-cc54-4cb4-94b4-8f1c273cfb25",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Apple distribution",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 420,
+              "y": 50
+            },
+            "size": {
+              "width": 1176,
+              "height": 230
+            },
+            "attrs": {
+              "label": {
+                "text": "Attacker-controlled macOS workstation"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "75d1b579-945b-4b9f-b621-b83b9eb6206e",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Attacker-controlled macOS workstation",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 42,
+              "y": 340
+            },
+            "size": {
+              "width": 308,
+              "height": 220
+            },
+            "attrs": {
+              "label": {
+                "text": "iPhone (iOS 17.6)"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "4f26c773-8a81-47c5-88ed-858db72b50ff",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "iPhone (iOS 17.6)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 116,
+              "y": 135
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Apple App Store"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "59206454-c682-4840-ba56-71fad5a440fc",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "Apple App Store",
+              "description": "Apple servers that deliver the current production package of the target app to any Apple ID that holds the app licence.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 126,
+              "y": 390
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Target app"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "932124af-7ca6-4859-a858-0bf87d5db282",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Target app",
+              "description": "Target app installed on a physical iPhone signed in to the same Apple ID as the macOS workstation.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "ae236726-539d-42b4-88b9-e50ada371906",
+                  "title": "Obfuscated secrets recovered at runtime",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Obfuscation from Swift Confidential prevents easy static extraction, but secrets are de-obfuscated in memory when used. An attacker can still recover them at runtime through hooking, memory dumping or patching.",
+                  "mitigation": "Treat client-side secrets as recoverable: avoid shipping long-lived secrets in the app where possible, and add runtime integrity / anti-tampering checks to raise the cost of runtime attacks.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 1,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 490,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Apple Configurator"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "eba30154-39d1-494f-ad5a-704912a78ff5",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Apple Configurator",
+              "description": "Apple Configurator on macOS. Adding the target app from the Apps tab downloads the production IPA and caches it locally.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 750,
+              "y": 135
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Configurator cache"
+              },
+              "topLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "id": "30505691-27ce-433e-a67c-4abd1ccdeb3d",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "name": "Configurator cache",
+              "description": "~/Library/Group Containers/K36BKF7T3D.group.com.apple.configurator/Library/Caches/Assets/TemporaryItems/MobileApps/ - temporary copy of the downloaded .ipa.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1072,
+              "y": 135
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Extracted IPA"
+              },
+              "topLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "id": "a1237ee1-550a-4beb-b740-515e3fea2a83",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": true,
+              "storesInventory": false,
+              "name": "Extracted IPA",
+              "description": "Copy of the .ipa in the analysis workspace: app executable, Info.plist and bundled .plist / resource files.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "5187325a-7b3e-4b13-bfac-804435125887",
+                  "title": "Hardcoded secrets extracted from the app binary",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "Static analysis of the IPA (e.g. MobSF) recovers plaintext literals compiled into the executable, such as hardcoded credentials, API keys, URLs and configuration values. MITRE ATT&CK: Discovery (TA0032). Playbook: playbooks/ios-platform-feature-01-risk-01.md",
+                  "mitigation": "ios-platform-feature-01-risk-01-control-01 - Obfuscate plaintext literals: move sensitive literals to confidential.yml (not bundled), let the Swift Confidential build plugin generate obfuscated accessors (Secrets.$apiKey), then re-scan the rebuilt IPA with MobSF to verify the literals are no longer recoverable.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 2,
+                  "score": ""
+                },
+                {
+                  "id": "9d3b6153-0159-46db-99a7-532f848163c3",
+                  "title": "Credentials exposed in bundled .plist resources",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "App resources such as bundled .plist files are extracted directly from the IPA, exposing plaintext usernames, passwords and other configuration values.",
+                  "mitigation": "ios-platform-feature-01-risk-01-control-02 - Remove plaintext literals from bundled .plist files; replace stored credentials with salted SHA-256 hashes and compare hash(input + salt) at authentication; re-run MobSF to confirm no plaintext literals remain.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 3,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 1386,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "MobSF"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "ebfd80f8-7d4b-4646-a5a6-40d82ba5cd3a",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "MobSF",
+              "description": "Mobile Security Framework static analyser used to score the app and surface hardcoded keys, embedded URLs and other exposed data.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1376,
+              "y": 365
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Attacker"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "f491e6ab-917c-445a-9e81-4d90fb2e8edc",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "Attacker",
+              "description": "Adversary (or authorised tester) with an Apple ID that holds the app licence and a macOS workstation.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "d92c8dc5-20fc-486a-b79b-1fba8727a115",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Production IPA download",
+              "description": "Apple Configurator downloads the current production package using the Apple ID app licence.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS",
+              "threats": [
+                {
+                  "id": "db295dde-1d25-4607-8bf6-9b170424d293",
+                  "title": "Production IPA obtainable by any licensed Apple ID",
+                  "status": "NotApplicable",
+                  "severity": "TBD",
+                  "type": "Information disclosure",
+                  "description": "Platform behaviour (ios-platform-feature-01): any user with the app licence can obtain the production IPA through Apple Configurator. This cannot be prevented by the app; the model assumes the attacker holds the IPA.",
+                  "mitigation": "Accepted platform behaviour - design the app assuming its package is public. See the controls on the Extracted IPA store.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 4,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Production IPA download"
+            ],
+            "source": {
+              "cell": "59206454-c682-4840-ba56-71fad5a440fc"
+            },
+            "target": {
+              "cell": "eba30154-39d1-494f-ad5a-704912a78ff5"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "e52803a2-ff9a-4e32-ad62-207c7672e47d",
+            "data": {
+              "type": "tm.Flow",
+              "name": "USB pairing + app licence",
+              "description": "iPhone connected over USB, signed in to the same Apple ID so Configurator can access the app licence.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "USB",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "USB pairing + app licence"
+            ],
+            "source": {
+              "cell": "932124af-7ca6-4859-a858-0bf87d5db282"
+            },
+            "target": {
+              "cell": "eba30154-39d1-494f-ad5a-704912a78ff5"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "6a629b0d-3c82-4e4f-9a19-99940c9cc224",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Writes .ipa",
+              "description": "Downloaded package temporarily stored in the local cache.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Writes .ipa"
+            ],
+            "source": {
+              "cell": "eba30154-39d1-494f-ad5a-704912a78ff5"
+            },
+            "target": {
+              "cell": "30505691-27ce-433e-a67c-4abd1ccdeb3d"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "da4eefee-7e35-485f-b8d3-0eab7a20156e",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Copy .ipa",
+              "description": "Attacker copies the .ipa from the cache to the analysis workspace using Terminal.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Copy .ipa"
+            ],
+            "source": {
+              "cell": "30505691-27ce-433e-a67c-4abd1ccdeb3d"
+            },
+            "target": {
+              "cell": "a1237ee1-550a-4beb-b740-515e3fea2a83"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "aba34dcb-f18a-4cfa-afcd-0f0c1d83dd62",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Upload .ipa",
+              "description": "IPA uploaded to MobSF for static analysis.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Upload .ipa"
+            ],
+            "source": {
+              "cell": "a1237ee1-550a-4beb-b740-515e3fea2a83"
+            },
+            "target": {
+              "cell": "ebfd80f8-7d4b-4646-a5a6-40d82ba5cd3a"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "87aadf8f-90a4-4a0f-9bb6-aca96152b74e",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Findings report",
+              "description": "Report listing hardcoded keys, embedded URLs, possible credentials and configuration issues.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Findings report"
+            ],
+            "source": {
+              "cell": "ebfd80f8-7d4b-4646-a5a6-40d82ba5cd3a"
+            },
+            "target": {
+              "cell": "f491e6ab-917c-445a-9e81-4d90fb2e8edc"
+            },
+            "vertices": []
+          }
+        ],
+        "description": "IPA Analysis"
+      },
+      {
+        "id": 1,
+        "title": "ios-platform-feature-02-risk-01",
+        "diagramType": "STRIDE",
+        "placeholder": "New STRIDE diagram description",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": [
+          {
+            "position": {
+              "x": 42,
+              "y": 50
+            },
+            "size": {
+              "width": 392,
+              "height": 460
+            },
+            "attrs": {
+              "label": {
+                "text": "iPhone (iOS 17.6)"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "3606bcbe-0a89-4e9c-a8ae-174ae250f5cd",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "iPhone (iOS 17.6)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 560,
+              "y": 50
+            },
+            "size": {
+              "width": 476,
+              "height": 460
+            },
+            "attrs": {
+              "label": {
+                "text": "Attacker macOS workstation (same Wi-Fi)"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "cfa0ea55-f7e7-43bc-b481-e524ed3ec271",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Attacker macOS workstation (same Wi-Fi)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 1162,
+              "y": 50
+            },
+            "size": {
+              "width": 392,
+              "height": 240
+            },
+            "attrs": {
+              "label": {
+                "text": "Internet"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "128119d7-17c8-4b10-a9b0-7b7741857570",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Internet",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 168,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Target app"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "f3a49486-fb41-415c-9b31-2fa039912055",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Target app",
+              "description": "Target app on the iPhone; Wi-Fi is configured with a manual proxy pointing at the workstation on port 8080.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "4d3aab3b-aa57-4ed7-ae3d-255a715ff3d9",
+                  "title": "Interception proxy accepted as the backend",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "description": "Because the Burp CA is fully trusted on the device and the app does not pin, the app accepts Burp-issued certificates as the backend's identity.",
+                  "mitigation": "Implement certificate or public-key pinning for backend connections (the playbook notes pinned apps reject Burp certificates). Complement with ios-platform-feature-02-risk-01-control-01 proxy detection.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 5,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 148,
+              "y": 375
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "iOS trust store"
+              },
+              "topLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "id": "80037117-5100-441b-aad0-af40e7131a0a",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "name": "iOS trust store",
+              "description": "Device certificate trust settings. Burp Suite CA profile installed and enabled under Certificate Trust Settings.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "id": "7511bcd1-0871-47e9-b4eb-068968871517",
+                  "title": "User-installed interception CA is fully trusted",
+                  "status": "NotApplicable",
+                  "severity": "TBD",
+                  "type": "Tampering",
+                  "description": "Installing and trusting the Burp CA is a test prerequisite, not itself a vulnerability (see playbooks/ios-platform-feature-02-risk-01.md). It is recorded here to make the assumption explicit.",
+                  "mitigation": "No app-side control; the risk is realised only when the app does not pin certificates.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 6,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 728,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Burp Suite proxy"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Burp Suite proxy",
+              "description": "Burp Suite proxy listener on port 8080 bound to all interfaces (or the Mac's local IP), terminating and re-establishing TLS.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 708,
+              "y": 375
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Burp HTTP history"
+              },
+              "topLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "id": "21e2872f-a683-4376-b90f-1a5a38280f00",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "name": "Burp HTTP history",
+              "description": "Proxy > HTTP history containing decrypted requests and responses.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1278,
+              "y": 135
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "App backend API"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "11c785b3-2314-4202-88e0-a29757b485cd",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "App backend API",
+              "description": "Backend endpoints the target app communicates with over HTTPS.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 718,
+              "y": 565
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Attacker"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "c99499a1-f2f9-4841-b293-b64fac167651",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "Attacker",
+              "description": "Adversary (or authorised tester) on the same Wi-Fi network who controls the proxy and installed the CA on the device.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "db0114ab-0221-4ac3-b84f-9e3073988c62",
+            "data": {
+              "type": "tm.Flow",
+              "name": "HTTPS via Wi-Fi proxy",
+              "description": "App requests routed to Burp through the manual Wi-Fi proxy and decrypted with the Burp CA.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": false,
+              "protocol": "HTTPS",
+              "threats": [
+                {
+                  "id": "f04185b9-a203-4423-81e1-16e1bc6dee92",
+                  "title": "HTTPS traffic decrypted by a trusted interception CA",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "App HTTPS traffic is routed through a locally trusted interception proxy and visible in decrypted form, exposing endpoints, tokens and personal data. A finding means no effective pinning was observed for that exchange; it does not mean HTTPS is broken. MITRE ATT&CK: Collection (TA0035). Playbook: playbooks/ios-platform-feature-02-risk-01.md",
+                  "mitigation": "ios-platform-feature-02-risk-01-control-01 - Detect HTTPS traffic proxying: call CFNetworkCopySystemProxySettings() and check HTTPEnable, HTTPSEnable and ProxyAutoConfigEnable; if any is enabled, warn the user, log an alert or stop the request. Add certificate pinning so a trusted interception CA alone is not enough.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 7,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "HTTPS via Wi-Fi proxy"
+            ],
+            "source": {
+              "cell": "f3a49486-fb41-415c-9b31-2fa039912055"
+            },
+            "target": {
+              "cell": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "544ee057-f334-418f-a308-7373b0df762b",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Re-encrypted HTTPS",
+              "description": "Burp forwards the (possibly modified) request to the real backend.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS",
+              "threats": [
+                {
+                  "id": "cb60f0f7-1ab5-4ac4-8100-b4b6661cb2e6",
+                  "title": "Requests modified in transit by the proxy",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "description": "An intermediary that can decrypt traffic can also modify requests and responses before forwarding them.",
+                  "mitigation": "ios-platform-feature-02-risk-01-control-01 - detect a configured proxy and stop sensitive requests; certificate pinning; validate all requests server-side.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 8,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Re-encrypted HTTPS"
+            ],
+            "source": {
+              "cell": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484"
+            },
+            "target": {
+              "cell": "11c785b3-2314-4202-88e0-a29757b485cd"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "ffade79e-aa14-47f8-83c5-d3b7d720ed85",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Responses",
+              "description": "Backend responses returned to the proxy.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": true,
+              "protocol": "HTTPS",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Responses"
+            ],
+            "source": {
+              "cell": "11c785b3-2314-4202-88e0-a29757b485cd"
+            },
+            "target": {
+              "cell": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484"
+            },
+            "vertices": [
+              {
+                "x": 1099,
+                "y": 250
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "291323a4-91a9-43ed-a3a4-4e97fc964014",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Responses (Burp-issued cert)",
+              "description": "Responses delivered to the app over a TLS session terminated by Burp.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": true,
+              "isPublicNetwork": false,
+              "protocol": "HTTPS",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Responses (Burp-issued cert)"
+            ],
+            "source": {
+              "cell": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484"
+            },
+            "target": {
+              "cell": "f3a49486-fb41-415c-9b31-2fa039912055"
+            },
+            "vertices": [
+              {
+                "x": 518,
+                "y": 250
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "03342796-cd36-4b5b-a174-0bbc897ddbfd",
+            "data": {
+              "type": "tm.Flow",
+              "name": "CA trust decision",
+              "description": "Device trust evaluation accepts certificates issued by the Burp CA.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "CA trust decision"
+            ],
+            "source": {
+              "cell": "80037117-5100-441b-aad0-af40e7131a0a"
+            },
+            "target": {
+              "cell": "f3a49486-fb41-415c-9b31-2fa039912055"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "1edba03e-d55c-40de-bf72-8784b5dbabcd",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Decrypted traffic logged",
+              "description": "Decrypted requests and responses recorded in HTTP history.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Decrypted traffic logged"
+            ],
+            "source": {
+              "cell": "b7bf9940-ae9a-4b10-8d67-9d7b306c6484"
+            },
+            "target": {
+              "cell": "21e2872f-a683-4376-b90f-1a5a38280f00"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "cfc85b35-a36d-41e4-8b9b-dc0c867ca0c9",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Review traffic",
+              "description": "Attacker reviews endpoints and sensitive data in HTTP history.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Review traffic"
+            ],
+            "source": {
+              "cell": "21e2872f-a683-4376-b90f-1a5a38280f00"
+            },
+            "target": {
+              "cell": "c99499a1-f2f9-4841-b293-b64fac167651"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "4599895b-8d47-4a4d-9565-77857135db12",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Install + trust Burp CA",
+              "description": "CA downloaded from http://burp/, installed as a profile and enabled for full trust.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Install + trust Burp CA"
+            ],
+            "source": {
+              "cell": "c99499a1-f2f9-4841-b293-b64fac167651"
+            },
+            "target": {
+              "cell": "80037117-5100-441b-aad0-af40e7131a0a"
+            },
+            "vertices": [
+              {
+                "x": 238,
+                "y": 600
+              }
+            ]
+          }
+        ],
+        "description": "HTTPS Traffic"
+      },
+      {
+        "id": 2,
+        "title": "ios-platform-feature-03-risk-01",
+        "diagramType": "STRIDE",
+        "placeholder": "New STRIDE diagram description",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": [
+          {
+            "position": {
+              "x": 308,
+              "y": 60
+            },
+            "size": {
+              "width": 308,
+              "height": 220
+            },
+            "attrs": {
+              "label": {
+                "text": "Target app sandbox"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "0eb8a8e5-8465-4972-a7f0-343eec9be7e6",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Target app sandbox",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "07f5cf8f-591f-4614-903f-6949d23d553f",
+                "72e70130-1dcf-43e1-91d1-ff3d2fdfd2f6"
+              ],
+              "containedElements": [
+                "0296a050-d518-4e41-a058-cccf70a38b1d"
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 700,
+              "y": 60
+            },
+            "size": {
+              "width": 336,
+              "height": 460
+            },
+            "attrs": {
+              "label": {
+                "text": "iOS screen capture services"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "da88e409-16cd-4b8e-ab51-f5b59ec24c54",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "iOS screen capture services",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "72e70130-1dcf-43e1-91d1-ff3d2fdfd2f6",
+                "35f25e72-13e8-4b92-8990-4fca4df61116",
+                "d46dce94-7b6e-45f8-8054-590127ac37ea"
+              ],
+              "containedElements": [
+                "38013978-da5e-45ce-b63b-c31c757d2802",
+                "ab635efc-344e-48ec-8113-13ecb9c141a1"
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 1120,
+              "y": 60
+            },
+            "size": {
+              "width": 392,
+              "height": 400
+            },
+            "attrs": {
+              "label": {
+                "text": "Malicious recorder app"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "d22a56f4-f196-4bef-a8f0-ab47d9babd70",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Malicious recorder app",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "35f25e72-13e8-4b92-8990-4fca4df61116",
+                "1bc87c6e-6c00-483c-8dc3-d0e736ab96e4"
+              ],
+              "containedElements": [
+                "43859fbc-eb67-4706-879d-bbc2af43a178",
+                "f056661d-9933-43ef-a0fa-2da9b90404ea"
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 1120,
+              "y": 500
+            },
+            "size": {
+              "width": 392,
+              "height": 230
+            },
+            "attrs": {
+              "label": {
+                "text": "Attacker macOS (AirPlay receiver)"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "6e12ec53-9040-4777-8597-78974f671fa5",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Attacker macOS (AirPlay receiver)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [
+                "d46dce94-7b6e-45f8-8054-590127ac37ea",
+                "3f7586c0-edea-4c15-91a9-b5700279e27e"
+              ],
+              "containedElements": [
+                "20bf91eb-7007-490f-aa5f-06e4851723b9"
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 74,
+              "y": 135
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "User"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "3d5194c1-3f5c-4409-8993-e41bd184e50c"
+                },
+                {
+                  "group": "right",
+                  "id": "1c5a0379-85e8-4a1d-b92c-9b5dc97c6a90"
+                },
+                {
+                  "group": "bottom",
+                  "id": "90f8f273-8b84-4080-989b-3b4e54afcbd1"
+                },
+                {
+                  "group": "left",
+                  "id": "ea8afea6-c42a-49a3-8986-85e852dc585a"
+                }
+              ]
+            },
+            "id": "3ac4dca3-151a-4e0a-9474-1f71a3d5dcf0",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "User",
+              "description": "Legitimate user entering or viewing sensitive information in the target app.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 392,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Target app UI"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e558b594-2d2b-41ba-addf-d3fe1c8b34cd"
+                },
+                {
+                  "group": "right",
+                  "id": "bf384deb-3d29-405f-ac4e-14eabdc377a0"
+                },
+                {
+                  "group": "bottom",
+                  "id": "eb950f1f-6921-40ae-8435-db023ee4a71e"
+                },
+                {
+                  "group": "left",
+                  "id": "a78ed0fe-1fe2-44a5-a5d9-d837a541962a"
+                }
+              ]
+            },
+            "id": "0296a050-d518-4e41-a058-cccf70a38b1d",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Target app UI",
+              "description": "Target app screens that display or accept usernames, email addresses, passwords and other PII.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "3822f8ed-7250-4806-bd14-946a12ea118a",
+                  "title": "On-screen PII outside secure fields remains capturable",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "SecureField protects text input fields only. Other sensitive content displayed on screen (usernames, email addresses, account details) can still be captured.",
+                  "mitigation": "Residual risk not covered by the current playbook control. Consider hiding or masking sensitive views while the screen is being captured or mirrored.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 9,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 798,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "iOS ReplayKit"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "b3421f36-daec-457d-86dc-f139176bfc86"
+                },
+                {
+                  "group": "right",
+                  "id": "a430c9df-1261-48cb-bc2c-e755effaeefa"
+                },
+                {
+                  "group": "bottom",
+                  "id": "cfb792c9-1f02-4ac5-a094-8216aa960f80"
+                },
+                {
+                  "group": "left",
+                  "id": "3ca0e6b3-ed24-402a-8088-f6ee77ccde7a"
+                }
+              ]
+            },
+            "id": "38013978-da5e-45ce-b63b-c31c757d2802",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "iOS ReplayKit",
+              "description": "System screen capture: screenshots, Control Centre screen recording, broadcast extensions and AirPlay screen mirroring.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 778,
+              "y": 385
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Photos (screenshots)"
+              },
+              "topLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "9c97ff1f-445b-424c-99e2-08fe823ad897"
+                },
+                {
+                  "group": "right",
+                  "id": "a37c7592-12af-4438-8fc3-752609137dc0"
+                },
+                {
+                  "group": "bottom",
+                  "id": "93a9d48b-32b4-41f6-928f-7ea01299d0a4"
+                },
+                {
+                  "group": "left",
+                  "id": "25ba6ae9-e926-4597-bb26-e0600de8fc03"
+                }
+              ]
+            },
+            "id": "ab635efc-344e-48ec-8113-13ecb9c141a1",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "name": "Photos (screenshots)",
+              "description": "Screenshots and screen recordings saved to the Photos library.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "811ff639-fadb-4033-88ab-efa12a799b16",
+                  "title": "Sensitive screens saved as screenshots or recordings",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "Volume Up + Side button screenshots or Control Centre recordings store the app interface, including sensitive data, in the Photos library.",
+                  "mitigation": "ios-platform-feature-03-risk-01-control-01 - use SecureField for sensitive inputs so their contents are excluded from screenshots and recordings.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 10,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 1246,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Recorder extension"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "6b4c9534-2ec3-49b4-83b1-86f812f802fd"
+                },
+                {
+                  "group": "right",
+                  "id": "1c68104b-23f6-4cd6-bd45-c0f5a22a0d0a"
+                },
+                {
+                  "group": "bottom",
+                  "id": "1dc77a58-7fa4-4cb0-9a56-07e363f91313"
+                },
+                {
+                  "group": "left",
+                  "id": "c649c1a2-e166-46e2-abd9-d312602955a8"
+                }
+              ]
+            },
+            "id": "43859fbc-eb67-4706-879d-bbc2af43a178",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Recorder extension",
+              "description": "feature3-replay_consent_recorder broadcast upload extension; processSampleBuffer appends video frames to a file.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1226,
+              "y": 345
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Recorded video"
+              },
+              "topLine": {
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "e8151add-2a69-4f27-b2df-8128e3f5fdc7"
+                },
+                {
+                  "group": "right",
+                  "id": "36fddd40-cbe3-48b2-9614-ce3894c476db"
+                },
+                {
+                  "group": "bottom",
+                  "id": "be51c0ad-4e9e-4581-8c68-557b936e0bcb"
+                },
+                {
+                  "group": "left",
+                  "id": "66b53491-3dd1-485f-a922-fd5667dc8472"
+                }
+              ]
+            },
+            "id": "f056661d-9933-43ef-a0fa-2da9b90404ea",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": false,
+              "storesInventory": false,
+              "name": "Recorded video",
+              "description": "Video file written by the recorder app.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1246,
+              "y": 565
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "AirPlay receiver"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "1b93fc39-2c7e-4d3d-b46b-c67bbcc734ae"
+                },
+                {
+                  "group": "right",
+                  "id": "7d447bbd-8fbe-439d-96b5-ed67f49004a7"
+                },
+                {
+                  "group": "bottom",
+                  "id": "eccec35c-018d-419d-ab44-a1c77e12f63c"
+                },
+                {
+                  "group": "left",
+                  "id": "22f9c2fb-3ace-46a4-ada2-5fe3a20ee089"
+                }
+              ]
+            },
+            "id": "20bf91eb-7007-490f-aa5f-06e4851723b9",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "AirPlay receiver",
+              "description": "macOS AirPlay Receiver set to \"Allow AirPlay for Everyone\" receiving the mirrored iPhone display.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1642,
+              "y": 345
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Attacker"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "f3de4c7f-7d0d-4aa0-80fb-e1cac9148bcc"
+                },
+                {
+                  "group": "right",
+                  "id": "675c2374-3046-49d8-bf9a-da015152946b"
+                },
+                {
+                  "group": "bottom",
+                  "id": "9cea6aa6-1d56-4782-b04e-177b99390009"
+                },
+                {
+                  "group": "left",
+                  "id": "1dae1aa5-cda2-43a1-ad22-8037cb844cd8"
+                }
+              ]
+            },
+            "id": "936dac53-eccf-408a-844c-ea2d56be8425",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "Attacker",
+              "description": "Adversary who controls the recorder app or AirPlay receiver.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Enters / views PII",
+              "description": "User enters or views sensitive information.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "0eb8a8e5-8465-4972-a7f0-343eec9be7e6"
+              ]
+            },
+            "labels": [
+              "Enters / views PII"
+            ],
+            "id": "07f5cf8f-591f-4614-903f-6949d23d553f",
+            "source": {
+              "cell": "3ac4dca3-151a-4e0a-9474-1f71a3d5dcf0"
+            },
+            "target": {
+              "cell": "0296a050-d518-4e41-a058-cccf70a38b1d"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Rendered screen frames",
+              "description": "App interface rendered and available to system capture.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "0eb8a8e5-8465-4972-a7f0-343eec9be7e6",
+                "da88e409-16cd-4b8e-ab51-f5b59ec24c54"
+              ]
+            },
+            "labels": [
+              "Rendered screen frames"
+            ],
+            "id": "72e70130-1dcf-43e1-91d1-ff3d2fdfd2f6",
+            "source": {
+              "cell": "0296a050-d518-4e41-a058-cccf70a38b1d"
+            },
+            "target": {
+              "cell": "38013978-da5e-45ce-b63b-c31c757d2802"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Broadcast video frames",
+              "description": "CMSampleBuffer frames delivered after the user taps Start Broadcast.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [
+                {
+                  "id": "44ac8bee-75ae-478c-8dd3-3ebd4415f452",
+                  "title": "Sensitive content captured by an authorised screen recording",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "A malicious app with a user-approved broadcast session records the target app's display and collects sensitive information shown on screen. MITRE ATT&CK: Collection (TA0035). Playbook: playbooks/ios-platform-feature-03-risk-01.md",
+                  "mitigation": "ios-platform-feature-03-risk-01-control-01 - Protect sensitive text fields: replace TextField with SecureField for sensitive inputs such as Password so their contents do not appear in screen recordings, screen shares or screenshots.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 11,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "da88e409-16cd-4b8e-ab51-f5b59ec24c54",
+                "d22a56f4-f196-4bef-a8f0-ab47d9babd70"
+              ]
+            },
+            "labels": [
+              "Broadcast video frames"
+            ],
+            "id": "35f25e72-13e8-4b92-8990-4fca4df61116",
+            "source": {
+              "cell": "38013978-da5e-45ce-b63b-c31c757d2802"
+            },
+            "target": {
+              "cell": "43859fbc-eb67-4706-879d-bbc2af43a178"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Writes video file",
+              "description": "Frames saved to a video file.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Writes video file"
+            ],
+            "id": "06682605-60f0-4347-bf36-16d09d5ad877",
+            "source": {
+              "cell": "43859fbc-eb67-4706-879d-bbc2af43a178"
+            },
+            "target": {
+              "cell": "f056661d-9933-43ef-a0fa-2da9b90404ea"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Review recording",
+              "description": "Attacker reviews captured images and video.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "d22a56f4-f196-4bef-a8f0-ab47d9babd70"
+              ]
+            },
+            "labels": [
+              "Review recording"
+            ],
+            "id": "1bc87c6e-6c00-483c-8dc3-d0e736ab96e4",
+            "source": {
+              "cell": "f056661d-9933-43ef-a0fa-2da9b90404ea"
+            },
+            "target": {
+              "cell": "936dac53-eccf-408a-844c-ea2d56be8425"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Screenshot / recording",
+              "description": "Screenshot or Control Centre recording saved.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Screenshot / recording"
+            ],
+            "id": "30300467-2865-42ef-bf1c-a7006aaa30c8",
+            "source": {
+              "cell": "38013978-da5e-45ce-b63b-c31c757d2802"
+            },
+            "target": {
+              "cell": "ab635efc-344e-48ec-8113-13ecb9c141a1"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Screen mirroring",
+              "description": "Control Centre > Screen Mirroring to the macOS workstation.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "AirPlay",
+              "threats": [
+                {
+                  "id": "073680f9-c61d-4214-8fe0-1e76e7280d5e",
+                  "title": "Screen mirrored to an attacker-controlled receiver",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Information disclosure",
+                  "description": "AirPlay mirroring streams the app display to a macOS receiver where it can be viewed and captured.",
+                  "mitigation": "ios-platform-feature-03-risk-01-control-01 - SecureField contents are hidden from screen sharing.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 12,
+                  "score": ""
+                }
+              ],
+              "trustBoundaryIds": [
+                "da88e409-16cd-4b8e-ab51-f5b59ec24c54",
+                "6e12ec53-9040-4777-8597-78974f671fa5"
+              ]
+            },
+            "labels": [
+              "Screen mirroring"
+            ],
+            "id": "d46dce94-7b6e-45f8-8054-590127ac37ea",
+            "source": {
+              "cell": "38013978-da5e-45ce-b63b-c31c757d2802"
+            },
+            "target": {
+              "cell": "20bf91eb-7007-490f-aa5f-06e4851723b9"
+            },
+            "vertices": [
+              {
+                "x": 1064,
+                "y": 270
+              },
+              {
+                "x": 1064,
+                "y": 635
+              }
+            ]
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Capture mirrored display",
+              "description": "Mirrored display viewed and captured on the workstation.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "6e12ec53-9040-4777-8597-78974f671fa5"
+              ]
+            },
+            "labels": [
+              "Capture mirrored display"
+            ],
+            "id": "3f7586c0-edea-4c15-91a9-b5700279e27e",
+            "source": {
+              "cell": "20bf91eb-7007-490f-aa5f-06e4851723b9"
+            },
+            "target": {
+              "cell": "936dac53-eccf-408a-844c-ea2d56be8425"
+            },
+            "vertices": []
+          }
+        ],
+        "description": "Capture On-Screen Content"
+      },
+      {
+        "id": 3,
+        "title": "ios-platform-feature-04-risk-01",
+        "diagramType": "STRIDE",
+        "placeholder": "New STRIDE diagram description",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": [
+          {
+            "position": {
+              "x": 308,
+              "y": 50
+            },
+            "size": {
+              "width": 728,
+              "height": 420
+            },
+            "attrs": {
+              "label": {
+                "text": "Third-party keyboard app (Full Access)"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "241f996c-a715-4795-ae30-0342fbf3a937",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Third-party keyboard app (Full Access)",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 1148,
+              "y": 50
+            },
+            "size": {
+              "width": 364,
+              "height": 240
+            },
+            "attrs": {
+              "label": {
+                "text": "Target app sandbox"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "701ea28d-dd54-4bee-94ab-bd64b2eb8ca6",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "Target app sandbox",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 308,
+              "y": 520
+            },
+            "size": {
+              "width": 420,
+              "height": 190
+            },
+            "attrs": {
+              "label": {
+                "text": "iOS system"
+              }
+            },
+            "visible": true,
+            "shape": "trust-boundary-box",
+            "zIndex": -50,
+            "id": "49896ef6-7fb0-49fd-8679-bc4396856033",
+            "data": {
+              "type": "tm.BoundaryBox",
+              "name": "iOS system",
+              "description": "",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false,
+              "crossingFlows": [],
+              "containedElements": []
+            }
+          },
+          {
+            "position": {
+              "x": 60,
+              "y": 460
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "User"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "adb59dd5-2a85-43c4-b780-be1f2002a010",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "User",
+              "description": "Legitimate user typing into the target app.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 448,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Custom keyboard"
+              },
+              "body": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "f8bd602f-2e09-47da-bdf1-fbd2ba3e6d31",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Custom keyboard",
+              "description": "feature4-localkeyboard extension enabled under Settings > General > Keyboard with Allow Full Access; records each keystroke (KeystrokeStore.append).",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "4e7704c1-3e20-4193-840a-64549670ce06",
+                  "title": "Keystrokes captured by a third-party keyboard",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "A third-party custom keyboard records sensitive information entered into the target app. MITRE ATT&CK: Collection (TA0035). Playbook: playbooks/ios-platform-feature-04-risk-01.md",
+                  "mitigation": "ios-platform-feature-04-risk-01-control-01 - Protect sensitive text fields: use SecureField for Password, PIN and API key inputs, which forces iOS to use the system keyboard instead of third-party keyboards.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 13,
+                  "score": ""
+                },
+                {
+                  "id": "e1e390ee-5c6c-43c1-aa73-93fb5e72af7d",
+                  "title": "Full Access extends keyboard extension capabilities",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "type": "Elevation of privilege",
+                  "description": "Allow Full Access grants the keyboard extension additional permissions (e.g. network and shared-container access), increasing what it can do with captured input.",
+                  "mitigation": "ios-platform-feature-04-risk-01-control-01 keeps sensitive fields on the system keyboard. Residual risk: non-secure fields can still be typed with the custom keyboard.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 14,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 428,
+              "y": 345
+            },
+            "size": {
+              "width": 180,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "KeystrokeStore"
+              },
+              "topLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              },
+              "bottomLine": {
+                "stroke": "red",
+                "strokeWidth": 2.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "store",
+            "zIndex": 1,
+            "id": "4f7dc839-97ca-4257-99aa-ddee2805d15e",
+            "data": {
+              "type": "tm.Store",
+              "isALog": false,
+              "isEncrypted": false,
+              "isSigned": false,
+              "storesCredentials": true,
+              "storesInventory": false,
+              "name": "KeystrokeStore",
+              "description": "Captured keystrokes retained by the keyboard extension in storage shared with its container app.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "c4edb8ff-3adc-4b96-a254-2cda70a7d74a",
+                  "title": "Captured input retained by the keyboard app",
+                  "status": "Open",
+                  "severity": "High",
+                  "type": "Information disclosure",
+                  "description": "Text typed into the target app is persisted and can be viewed later in the keyboard container app.",
+                  "mitigation": "ios-platform-feature-04-risk-01-control-01 - SecureField prevents third-party keyboards from receiving sensitive input in the first place.",
+                  "modelType": "STRIDE",
+                  "new": false,
+                  "number": 15,
+                  "score": ""
+                }
+              ]
+            }
+          },
+          {
+            "position": {
+              "x": 784,
+              "y": 310
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Keyboard app"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "910a367c-88ae-4603-b887-d2cf6ed63ddc",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Keyboard app",
+              "description": "Keyboard container app that displays captured inputs.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1260,
+              "y": 100
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "Target app fields"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "52fcfdd0-95b9-4703-bbc4-390d9baedc2e",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "Target app fields",
+              "description": "Text fields in the target app (TextField / SecureField).",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 448,
+              "y": 545
+            },
+            "size": {
+              "width": 140,
+              "height": 140
+            },
+            "attrs": {
+              "text": {
+                "text": "System keyboard"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "zIndex": 1,
+            "id": "c2dc35db-c570-4a6f-8156-161dfe078a84",
+            "data": {
+              "type": "tm.Process",
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "name": "System keyboard",
+              "description": "Default iOS keyboard, enforced by iOS for SecureField inputs.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": {
+              "x": 1250,
+              "y": 485
+            },
+            "size": {
+              "width": 160,
+              "height": 70
+            },
+            "attrs": {
+              "text": {
+                "text": "Attacker"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "actor",
+            "zIndex": 1,
+            "id": "3aab953b-043b-4281-b1bb-95a91e6a6901",
+            "data": {
+              "type": "tm.Actor",
+              "providesAuthentication": false,
+              "name": "Attacker",
+              "description": "Developer or operator of the malicious keyboard app.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "4949713a-ea83-49a6-ab70-b9f85b4907b3",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Keystrokes",
+              "description": "User types with the custom keyboard selected via the Globe key.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Keystrokes"
+            ],
+            "source": {
+              "cell": "adb59dd5-2a85-43c4-b780-be1f2002a010"
+            },
+            "target": {
+              "cell": "f8bd602f-2e09-47da-bdf1-fbd2ba3e6d31"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "bab2a363-4436-4b38-8a1f-ca7b8af6fbfb",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Inserted text",
+              "description": "Keyboard inserts text into the focused text field.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Inserted text"
+            ],
+            "source": {
+              "cell": "f8bd602f-2e09-47da-bdf1-fbd2ba3e6d31"
+            },
+            "target": {
+              "cell": "52fcfdd0-95b9-4703-bbc4-390d9baedc2e"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "e1667a36-46cc-4b42-ba90-2e43d7e98df0",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Record keystroke",
+              "description": "KeystrokeStore.append(text)",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Record keystroke"
+            ],
+            "source": {
+              "cell": "f8bd602f-2e09-47da-bdf1-fbd2ba3e6d31"
+            },
+            "target": {
+              "cell": "4f7dc839-97ca-4257-99aa-ddee2805d15e"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "d90a6ea7-2fd1-4fe6-8a1b-4b2a58b34aa3",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Read captured input",
+              "description": "Container app reads the captured inputs.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Read captured input"
+            ],
+            "source": {
+              "cell": "4f7dc839-97ca-4257-99aa-ddee2805d15e"
+            },
+            "target": {
+              "cell": "910a367c-88ae-4603-b887-d2cf6ed63ddc"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "9d33481e-4b15-4041-972b-287e4db43995",
+            "data": {
+              "type": "tm.Flow",
+              "name": "View captured text",
+              "description": "Captured input viewed by the attacker.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "View captured text"
+            ],
+            "source": {
+              "cell": "910a367c-88ae-4603-b887-d2cf6ed63ddc"
+            },
+            "target": {
+              "cell": "3aab953b-043b-4281-b1bb-95a91e6a6901"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "7b36492a-5e2e-4cce-b8aa-ec9134063b57",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Secure field input",
+              "description": "For SecureField inputs iOS switches to the system keyboard.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Secure field input"
+            ],
+            "source": {
+              "cell": "adb59dd5-2a85-43c4-b780-be1f2002a010"
+            },
+            "target": {
+              "cell": "c2dc35db-c570-4a6f-8156-161dfe078a84"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "id": "d5927f98-e282-4156-8fd8-66dae2ffd44d",
+            "data": {
+              "type": "tm.Flow",
+              "name": "Text (system keyboard)",
+              "description": "Sensitive input delivered without passing through third-party keyboards.",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              "Text (system keyboard)"
+            ],
+            "source": {
+              "cell": "c2dc35db-c570-4a6f-8156-161dfe078a84"
+            },
+            "target": {
+              "cell": "52fcfdd0-95b9-4703-bbc4-390d9baedc2e"
+            },
+            "vertices": [
+              {
+                "x": 1610,
+                "y": 615
+              },
+              {
+                "x": 1610,
+                "y": 170
+              }
+            ]
+          }
+        ],
+        "description": "Capture Text Input"
+      }
+    ],
+    "diagramTop": 4,
+    "reviewer": "",
+    "threatTop": 15
+  }
+}
