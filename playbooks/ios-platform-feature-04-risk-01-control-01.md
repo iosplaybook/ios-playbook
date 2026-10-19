@@ -35,6 +35,7 @@ SecureField("API Key", text: $apiKey)
 	.textInputAutocapitalization(.never)
 	.autocorrectionDisabled()
 ```
+
 *Code block shows implementation of `SecureField`*
 
 ### References

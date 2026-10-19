@@ -25,6 +25,8 @@ Install the custom keyboard app on the iPhone. Use Xcode to open the [feature4-l
 KeystrokeStore.append(text)
 ```
 
+*Code block implementation of key logger in an App.*
+
 #### 03. Add custom keyboard to iPhone
 
 Go to `Settings > General > Keyboard > Keyboards > Add New Keyboard`, then tap \[Keyboard Name] under Third-Party Keyboards. This enables the keyboard for use in apps.

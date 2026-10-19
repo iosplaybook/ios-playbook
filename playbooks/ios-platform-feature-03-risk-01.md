@@ -32,6 +32,8 @@ override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBuf
 }
 ```
 
+*Code block shows logic for screen recording function in an App.*
+
 #### 03. Start screen recording
 
 Tap `Start App Screen Recording`. When the system prompt appears, tap `Start Broadcast` to authorise and begin the recording.

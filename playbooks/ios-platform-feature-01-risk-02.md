@@ -50,6 +50,8 @@ On the macOS workstation, open Terminal and navigate to the Apple Configurator t
 ~/Library/Group\ Containers/K36BKF7T3D.group.com.apple.configurator/Library/Caches/Assets/TemporaryItems/MobileApps/
 ```
 
+*Code block shows location of cache directory.*
+
 <img src="assets/feature1_ss5_apple_config.png" width="500" alt="Alt text">
 
 _Screenshot shows the target app IPA in the Apple Configurator cache directory._
@@ -62,6 +64,8 @@ Use Apple's unzip utility to extract the newly created IPA into a working direct
 unzip <TARGET_APP>.ipa -d patched-ipa
 ```
 
+*Code block shows commands used to unzip an IPA.*
+
 #### 06. Download Frida Gadget   
 
 Download the [Frida Gadget](https://github.com/frida/frida/releases/download/17.9.10/frida-gadget-17.9.10-ios-universal.dylib.gz) build for iOS from the official Frida release page. The downloaded file is distributed as a compressed `.dylib.gz` file, so decompress it and rename to `FridaGadget.dylib` with the following commands.
@@ -70,6 +74,8 @@ Download the [Frida Gadget](https://github.com/frida/frida/releases/download/17.
 gunzip frida-gadget-17.9.10-ios-universal.dylib.gz
 mv frida-gadget-17.9.10-ios-universal.dylib FridaGadget.dylib
 ```
+
+*Code block shows commands used to unzip and move frida gadget.*
 
 #### 07. Put Frida Gadget in the app
 
@@ -122,6 +128,7 @@ cd ..
 ```
 
 *Code block shows commands used to resign and repackage IPA.*
+
 #### 09. Install the app 
 
 Use Apple's `devicectl` utility to note the `UDID` of the connected iPhone and install the signed `.app` bundle onto it.

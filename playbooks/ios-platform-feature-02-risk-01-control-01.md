@@ -18,6 +18,7 @@ guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as?
 	return nil
 }
 ```
+
 *Code block shows the source code calling `CFNetworkCopySystemProxySettings()` to retrieve the proxy configuration*
 
 #### 02. Check if HTTPs traffic uses proxy

@@ -30,7 +30,7 @@ Use App Attest or DeviceCheck and verify the attestation on the backend, so the 
 
 #### 04. Respond on the server, not only the client
 
-Have the backend restrict sensitive actions when attestation fails or is absent, rather than relying on the app to block itself. Enforcing server-side means a defeated client check still does not unlock protected functionality. Note: attestation relies on genuine Apple hardware and will not succeed on a virtual device, so confirm this layer on a physical device.
+Have the backend restrict sensitive actions when attestation fails or is absent, rather than relying on the app to block itself. Enforcing server-side means a defeated client check still does not unlock protected functionality. Note: attestation relies on genuine Apple hardware and will not succeed on a Corellium virtual device. A physical iOS device is currently not available for testing, so this layer is not demonstrated in this playbook and should be verified on a physical device when one becomes available.
 
 ### References
 
