@@ -37,3 +37,5 @@ Repeat the runtime manipulation from the risk and confirm that overriding the cl
 
 - https://mas.owasp.org/MASTG/0x04f-Testing-Local-Authentication/
 - https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
+
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-05-risk-02-control-01.zip).

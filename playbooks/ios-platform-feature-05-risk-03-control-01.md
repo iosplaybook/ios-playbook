@@ -36,3 +36,5 @@ Have the backend restrict sensitive actions when attestation fails or is absent,
 
 - https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity
 - https://mas.owasp.org/MASTG/0x06j-Testing-Resiliency-Against-Reverse-Engineering/
+
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-05-risk-03-control-01.zip).

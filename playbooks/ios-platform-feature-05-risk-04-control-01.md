@@ -39,3 +39,5 @@ Repeat the memory inspection from the risk at different points and confirm the s
 
 - https://mas.owasp.org/MASTG/0x06d-Testing-Data-Storage/
 - https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-05-risk-04-control-01.zip).

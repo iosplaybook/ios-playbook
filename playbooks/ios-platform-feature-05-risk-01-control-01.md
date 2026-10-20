@@ -41,3 +41,5 @@ Repeat the sandbox inspection from the risk and confirm the sensitive value is n
 
 - https://developer.apple.com/documentation/security/ksecattraccessiblewhenunlockedthisdeviceonly
 - https://mas.owasp.org/MASTG/0x06d-Testing-Data-Storage/
+
+The source code with the implemented control can be found [here](control-examples/ios-platform-feature-05-risk-01-control-01.zip).
