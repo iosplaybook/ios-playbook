@@ -87,6 +87,12 @@ objection -N -h 127.0.0.1 -P 27052 -n <bundle-id> start
 
 *Code block shows attaching to the selected Corellium app without relying on an implicit USB device*
 
+> Note: Attaching to a running app only hooks checks that run after attachment. If the target app checks for a jailbreak at launch, spawn the app under objection so the bypass is applied before the app's code runs:
+
+``` bash
+objection -N -h 127.0.0.1 -P 27052 -n <bundle-id> -s start --startup-command "ios jailbreak disable"
+```
+
 #### 07. Disable the detection
 
 Apply the jailbreak detection bypass, which hooks common checks such as file existence, protocol handlers, and process forking. The command attempts to bypass common checks; it is not guaranteed to cover every app or detection layer. Confirm live hook output and the app behavior before declaring success.

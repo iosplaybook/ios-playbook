@@ -15,16 +15,6 @@ Your app can prevent the risk of an attacker analysing the app's IPA file by tak
 2. Replace plaintext literals with salted hash values. During authentication, the submitted username and password are combined with their respective salts and passed through the hashing function before comparison.
 
 ``` swift
-private static let storedUsernameHash = "abd91873760b5ccd8f74541205c5583f062d795c8930f52d8575c15548f7da27"
-private static let storedPasswordHash = "249c3a3989fafa58eb8f2081e633c7abc027e66dd9d507707e074c087e4baf9a"
-
-private static let usernameSalt = "iosplaybook_username_salt"
-private static let passwordsalt = "iosplaybook_password_salt"
-```
-
-*Code block shows username and password as local variables and their respective hashes*
-
-``` swift
 private static let usernameSalt = "usalt-control2"
 private static let passwordSalt = "psalt-control2"
 private static let expectedUsernameHash = "9a22029b275e015671f75ba6875e00d14f15b94a931c3e47a7274995452fff24"
@@ -40,7 +30,9 @@ private static func sha256(_ value: String) -> String {
 }
 ```
 
-*Code block shows function to validate user input*
+*Code block shows the stored salted hashes and the function that validates user input against them*
+
+> Note: The salts and hashes remain in the app, and SHA-256 is fast to compute, so an attacker can recover short or common values by brute force. This control removes plaintext values from static analysis output; it does not make on-device credential checks safe. Credentials should be verified by the server.
 
 3. After removal, run the IPA through MobSF again to check for exposed plaintext literals.
 

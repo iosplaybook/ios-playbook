@@ -15,16 +15,17 @@ Issue access tokens with a short expiry and refresh them as needed, rather than 
 
 #### 02. Release secrets promptly
 
-Hold sensitive values only for the operation that needs them and drop the references as soon as it completes. Releasing promptly shortens how long the value stays resident.
+Hold sensitive values only for the operation that needs them, then overwrite them. Dropping a reference does not erase the value: the bytes stay in memory until that memory is reused, and Swift `String` values cannot be reliably overwritten. Keep secrets in a mutable `Data` buffer and zero it as soon as the operation completes.
 
 ``` swift
-func useToken(_ token: String) {
+func useToken(_ token: inout Data) {
     perform(with: token)
-    // Drop the reference as soon as the operation finishes.
+    // Overwrite the bytes rather than only dropping the reference.
+    token.resetBytes(in: 0..<token.count)
 }
 ```
 
-*Code block shows limiting a secret to the scope that needs it*
+*Code block shows overwriting a secret after the operation that needs it*
 
 #### 03. Avoid unnecessary plaintext copies
 

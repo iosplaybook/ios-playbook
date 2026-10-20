@@ -54,4 +54,3 @@ On the macOS workstation, open Terminal and navigate to the Apple Configurator t
 
 Because the iOS platform provides IPA acquisition feature, your app is at risk of:
 - [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)
-- [ios-platform-feature-01-risk-02](ios-platform-feature-01-risk-02.md)

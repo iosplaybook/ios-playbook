@@ -93,6 +93,10 @@ memory search "Bearer" --string --offsets-only
 
 *Code block shows searching the selected process for Bearer and retaining only matching addresses*
 
+<img src="assets/feature5_risk4_ss1.png" width="400" alt="Corrected memory search and value-free classification of synthetic session tokens">
+
+*Screenshot shows memory addresses found by objection*
+
 On the tested restored iOS image, objection 1.12.4 can abort with `A Frida agent exception has occurred` / `access violation` while scanning a range. That error is not a match, and an address in its stack trace is not a search result. Record the tool failure, exit objection, and attach Frida to the same running PID through the endpoint above. Run this fallback in that Frida session; it scans writable readable ranges individually and skips ranges that fault. It emits offsets and coverage counts only. Skipped ranges make the scan incomplete; no matches cannot establish that memory is free of secrets.
 
 ```javascript
@@ -113,7 +117,7 @@ console.log(JSON.stringify(searchResult));
 
 #### 08. Check for sensitive values
 
-A prefix match alone is not evidence of a complete token. Examine only the reported target-process addresses transiently, and record the data type and address rather than the bytes. For the fixture, a 52-byte value matching `Bearer LAB-ONLY-` followed by a UUID identifies the synthetic session token. In a Frida session attached to the same PID, substitute a current match address from the successful objection search or the fallback offsets list in the check below. Never reuse addresses from an earlier run. Do not retain the recovered values themselves as report evidence; record only the type of data observed and where it was found.
+A prefix match alone is not evidence of a complete token. Examine only the reported target-process addresses transiently, and record the data type and address rather than the bytes. For the fixture, a 52-byte value matching `Bearer LAB-ONLY-` followed by a UUID identifies the synthetic session token. In a Frida session attached to the same PID, substitute a current match address from the successful objection search or the fallback offsets list in the check below. Never reuse addresses from an earlier run. 
 
 ```javascript
 var address = ptr('<address-from-current-search>');
@@ -133,13 +137,9 @@ try {
 
 Live residency does not by itself prove the value was retained longer than necessary. Assess secret lifetime separately when testing a real app. Exit the instrumentation sessions and clear the fixture session when finished.
 
-<img src="assets/feature5_risk4_ss1.png" width="400" alt="Corrected memory search and value-free classification of synthetic session tokens">
+<img src="assets/feature5_risk4_ss2.png" width="400" alt="Token-type metadata at current match addresses, with recovered values omitted">
 
-*Screenshot shows recorded corrected-search and guarded-fallback results from the retest, *
-
-![[feature5_risk4_ss2.png]]
-
-*Screenshot shows recorded token-type metadata at current match addresses found by frida; recovered values are omitted*
+*Screenshot shows recorded corrected-search and guarded-fallback results from the retest*
 
 Feature-05-Risk-04 control measures:
 

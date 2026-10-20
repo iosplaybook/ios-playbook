@@ -66,4 +66,3 @@ Open the target app, tap any text field to open the keyboard, then press and hol
 Because the iOS platform provides Custom Keyboard feature, your app is at risk of:
 
 - [ios-platform-feature-04-risk-01](ios-platform-feature-04-risk-01.md)
-- [ios-platform-feature-04-risk-02_(deprioritise)](ios-platform-feature-04-risk-02_(deprioritise).md)

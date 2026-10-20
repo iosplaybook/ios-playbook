@@ -19,7 +19,7 @@ Set up the required environment with:
 * The target app IPA available for installation
 
 
-For a reproducible workflow check, use the minimal offline Jailbreak Lab 1.0 fixture, bundle `com.mobileplaybook.JailbreakLab`, saved in iOS intake. It contains only the four deliberately vulnerable test behaviors and generates synthetic session data. These demonstrations validate the procedure rather than the security of a production app. The tested tools were Frida client 17.9.10, the existing Frida server 17.19.0 and objection 1.12.4. Record versions when repeating the test.
+For a reproducible workflow check, use the minimal offline `Jailbreak Lab 1.0` fixture, bundle `com.mobileplaybook.JailbreakLab`, saved in sample apps. It contains only the four deliberately vulnerable test behaviours and generates synthetic session data. These demonstrations validate the procedure rather than the security of a production app. The tested tools were Frida client 17.9.10, the existing Frida server 17.19.0 and objection 1.12.4. Record versions when repeating the test.
 
 #### 02. Create and boot the device
 

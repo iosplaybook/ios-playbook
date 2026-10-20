@@ -25,10 +25,6 @@ guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as?
 
 Inspect the returned settings and check whether `HTTPEnable`, `HTTPSEnable`, or `ProxyAutoConfigEnable` is set to 1. Checking all three settings ensures coverage for HTTP proxies, HTTPS proxies, and Proxy Auto-Configuration (PAC) scripts.
 
-#### 03. Respond to detected proxy 
-
-If any proxy setting is enabled, trigger an appropriate response. Display a warning to the user, log an alert, or stop the network request. Taking immediate action helps prevent sensitive data from passing through an unverified intermediary that could intercept or modify the traffic.
-
 ``` swift
 guard isEnabled(settings[enabledKey]) else {
 	return nil
@@ -36,6 +32,20 @@ guard isEnabled(settings[enabledKey]) else {
 ```
 
 *Code block shows source code for proxy configuration check*
+
+#### 03. Respond to detected proxy 
+
+If any proxy setting is enabled, trigger an appropriate response. Display a warning to the user, log an alert, or stop the network request. Taking immediate action helps prevent sensitive data from passing through an unverified intermediary that could intercept or modify the traffic.
+
+``` swift
+if proxyDetected {
+	showProxyWarning()
+	cancelSensitiveRequests()
+	return
+}
+```
+
+*Code block shows the app's response when a proxy is detected*
 
 <img src="assets/feature2_risk1_control1_ss3.png" width="400" alt="Alt text">
 

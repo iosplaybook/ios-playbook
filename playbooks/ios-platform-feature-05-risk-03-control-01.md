@@ -24,9 +24,9 @@ let suspicious = signals.contains(true)
 
 Detect common instrumentation, such as injected hooking frameworks, so that tampering with the detection itself is also observable. Watching for hooks raises the effort needed to disable the checks at runtime.
 
-#### 03. Attest device integrity server-side
+#### 03. Attest app integrity server-side
 
-Use App Attest or DeviceCheck and verify the attestation on the backend, so the server can judge device integrity rather than trusting a client-reported result. Server-side verification means a bypassed client check does not convince the server.
+Use App Attest and verify the attestation and assertions on the backend, so the server can confirm requests come from a genuine copy of the app on genuine Apple hardware rather than trusting a client-reported result. App Attest does not report whether a device is jailbroken; it complements the on-device checks by rejecting modified or re-signed copies of the app and requests from other clients.
 
 #### 04. Respond on the server, not only the client
 
