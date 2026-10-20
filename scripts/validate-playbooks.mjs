@@ -81,7 +81,8 @@ async function main() {
 
 function validateFile(filePath) {
   const raw = fs.readFileSync(filePath, "utf8");
-  const lines = splitMarkdownLinesIgnoringCodeBlocks(raw);
+  const scan = splitMarkdownLinesIgnoringCodeBlocks(raw);
+  const lines = scan.lines;
   const diagnostics = [];
   const warnings = [];
   const passLogs = [];
@@ -95,6 +96,8 @@ function validateFile(filePath) {
   diagnostics.push(...checkUnreplacedPlaceholders(filePath, lines, passLogs));
   warnings.push(...checkInternalLinks(filePath, lines, passLogs));
   diagnostics.push(...checkTables(filePath, lines, passLogs));
+  diagnostics.push(...checkCodeFences(filePath, scan.fenceIssues, passLogs));
+  diagnostics.push(...checkCaptionsAndNotes(filePath, lines, scan.codeBlocks, passLogs));
   diagnostics.push(...validateStructure(filePath, lines, passLogs));
 
   return { diagnostics, warnings, passLogs };
@@ -120,332 +123,255 @@ function validateStructure(filePath, lines, passLogs) {
   }
 
   const basename = path.basename(filePath, ".md");
-  const type = inferTypeFromFilename(basename);
+  const classification = inferTypeFromFilename(basename);
 
   // The filename is the gateway to the correct rule set.
   // If the naming pattern is unclear, the validator stops with a failure
   // rather than guessing which public template the author intended to use.
-  if (!type) {
+  if (!classification) {
     return [
       makeDiagnostic(
         filePath,
         1,
         "filename.scheme",
         `The filename '${basename}.md' does not follow an approved playbook naming pattern, so the validator cannot determine which public template to apply.`,
-        "Rename the file to one of the approved patterns: 'ios-platform-feature-01.md', 'ios-platform-feature-01-risk-01.md', or 'ios-platform-feature-01-risk-01-control-01.md'. Each numbered placeholder must use two digits from 01 to 99."
+        "Rename the file to one of the approved patterns: 'ios-platform-feature-01.md', 'ios-platform-feature-01-<Tool>.md', 'ios-platform-feature-01-risk-01.md', or 'ios-platform-feature-01-risk-01-control-01.md'. Each numbered placeholder must use two digits from 01 to 99."
       ),
     ];
   }
 
+  const { type, id } = classification;
   passLogs.push(makePassLog(filePath, 1, `The filename follows the approved '${type}' playbook pattern.`));
 
-  // Once the filename pattern passes, the file is routed into the matching
-  // validator. Each validator enforces the exact public template for that
-  // document type and returns only pass notices or failures.
-  if (type === "feature") {
-    return validateFeatureFile(filePath, basename, items, passLogs);
-  }
-
-  if (type === "risk") {
-    return validateRiskFile(filePath, basename, items, passLogs);
-  }
-
-  return validateControlFile(filePath, basename, items, passLogs);
-}
-
-function validateFeatureFile(filePath, basename, items, passLogs) {
-  const levelThreeHeadings = items.filter((item) => item.text.startsWith("### "));
-  if (levelThreeHeadings.length > 3) {
-    return [
-      makeDiagnostic(
-        filePath,
-        levelThreeHeadings[3].line,
-        "feature.heading_count",
-        `Feature playbooks must contain exactly 3 level-3 section headings, but this document contains ${levelThreeHeadings.length}. The extra heading found here is '${levelThreeHeadings[3].text}'.`,
-        "Remove the extra '###' section heading so the feature playbook contains only '### Description', '### Additional context', and '### Demonstration'."
-      ),
-    ];
-  }
-
+  // Every playbook type shares the same opening: an identifier heading, a
+  // one-line title, a description, and a demonstration made of numbered
+  // '#### NN.' steps. Only the closing section differs per type.
   const state = createParser(filePath, items, passLogs);
 
-  // Feature playbooks describe a platform capability, explain its context,
-  // and show how it works.
-  // A mismatch in any required section is a failure because the document would
-  // no longer follow the agreed public template.
+  // A document with neither a demonstration nor any step is still in the
+  // earlier sentence-template layout; one failure says more than a cascade.
+  if (!items.some((item) => item.text === "### Demonstration" || /^#### /.test(item.text))) {
+    state.error(
+      items[0].line,
+      "structure.layout",
+      "This playbook does not use the required layout: it has no '### Demonstration' section and no '#### NN.' steps.",
+      "Restructure the document as '## <id>', '### Title', '### Description' and '### Demonstration' with '#### 01. <Heading>' steps, followed by the closing section for its type."
+    );
+    return state.diagnostics;
+  }
+
+  checkHeadingInventory(state, items, type);
+  validateCommonSections(state, type, id);
+
+  if (type === "feature") {
+    validateFeatureEnding(state, id);
+  } else if (type === "risk") {
+    validateRiskEnding(state, id);
+  } else {
+    validateControlEnding(state, filePath, id);
+  }
+
+  return state.diagnostics;
+}
+
+// A paragraph is prose: not a heading, image, caption, list item, note,
+// table row, or (blanked) code line.
+const PARAGRAPH_PATTERN = /^(?!#|<img\b|!\[|\*[^*\s]|[-*+] |\d+\. |>|\|)\S/;
+
+// The step terminators mark where the last demonstration step ends and the
+// closing section of each playbook type begins.
+const STEP_TERMINATORS = {
+  feature: /^Because .+, your app is at risk of:$/,
+  risk: /^Feature-\d{2}-Risk-\d{2} control measures:$/,
+  control: /^(### References|References:)$/,
+};
+
+function checkHeadingInventory(state, items, type) {
+  // Only the agreed headings may appear. Steps use '####'; any other heading
+  // level, or an extra '##' / '###' section, breaks the shared layout.
+  const allowedSections = new Set(["### Title", "### Description", "### Demonstration"]);
+  if (type === "control") {
+    allowedSections.add("### References");
+  }
+
+  const seen = new Set();
+  for (const item of items) {
+    if (!/^#{1,6}(\s|$)/.test(item.text) || /^#### /.test(item.text) || /^## /.test(item.text)) {
+      continue;
+    }
+
+    if (!allowedSections.has(item.text)) {
+      state.error(
+        item.line,
+        "structure.heading",
+        `The heading '${item.text}' is not part of the approved ${type} playbook layout.`,
+        `Use only '## <id>', ${[...allowedSections].map((heading) => `'${heading}'`).join(", ")} and '#### NN. <Heading>' step headings.`
+      );
+      continue;
+    }
+
+    if (seen.has(item.text)) {
+      state.error(item.line, "structure.heading_duplicate", `The heading '${item.text}' appears more than once in this document.`, "Merge the duplicate sections so each required heading appears exactly once.");
+    }
+    seen.add(item.text);
+  }
+}
+
+function validateCommonSections(state, type, id) {
   const heading = state.expect(
-    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9]))$/,
-    "feature.heading",
-    "The feature heading must be written exactly as '## ios-platform-feature-01', where '01' is replaced with a two-digit value from 01 to 99."
+    /^## (ios-platform-feature-\d{2}(?:-risk-\d{2}(?:-control-\d{2})?)?)$/,
+    `${type}.heading`,
+    `The top heading must be written exactly as '## ${id}'.`
   );
 
   const headingSlug = heading?.match[1] ?? null;
-  if (headingSlug && headingSlug !== basename) {
+  if (headingSlug && headingSlug !== id) {
     state.error(
       heading.line,
       "heading.filename_match",
-      `The top heading identifies this file as '${headingSlug}', but the filename is '${basename}.md'. These two identifiers must match so the document can be reviewed consistently.`,
-      `Rename the file to '${headingSlug}.md', or change the heading to '## ${basename}' so the heading and filename agree.`
+      `The top heading identifies this file as '${headingSlug}', but the filename identifies it as '${id}'. These two identifiers must match so the document can be reviewed consistently.`,
+      `Rename the file to match '${headingSlug}', or change the heading to '## ${id}' so the heading and filename agree.`
     );
   }
-  if (headingSlug === basename) {
+  if (headingSlug === id) {
     state.pass(heading.line, `The top heading matches the filename identifier '${headingSlug}'.`);
   }
 
-  // These paired checks confirm both format and internal consistency:
-  // - the wording must match the template
-  // - the same feature name must be reused across related sections
-  state.expectText("### Description", "feature.description_heading", "The next required section heading is '### Description'.");
-  const description = state.expect(
-    /^The iOS platform provides (.+) feature\.$/,
-    "feature.description_sentence",
-    "The description sentence must be written exactly as 'The iOS platform provides <feature_name> feature.'."
-  );
-  const featureName = description?.match[1] ?? null;
-  if (description) {
-    state.pass(description.line, "The description sentence follows the approved public wording.");
+  // The title is a single line so it can be reused as a link label.
+  if (state.section("### Title", `${type}.title_heading`)) {
+    const title = state.expectContent(/^(?!#).+$/, `${type}.title_line`, "The '### Title' heading must be followed by a single line naming the playbook.");
+    if (title && state.current() && !state.current().text.startsWith("#")) {
+      state.error(
+        state.current().line,
+        `${type}.title_line`,
+        `The title must be a single line, but the review found '${state.current().text}' after it instead of '### Description'.`,
+        "Shorten the title to one line and move any explanation into the description."
+      );
+      while (state.current() && !state.current().text.startsWith("#")) {
+        state.index += 1;
+      }
+    }
   }
 
-  state.expectText("### Additional context", "feature.additional_context_heading", "The next required section heading is '### Additional context'.");
-  const context = state.expect(
-    /^(.+) is a feature that (.+)\.$/,
-    "feature.additional_context_sentence",
-    "The additional context sentence must be written exactly as '<feature_name> is a feature that <function>.'"
-  );
-  if (context && featureName && context.match[1] !== featureName) {
-    state.error(
-      context.line,
-      "feature.additional_context_feature_name",
-      `The additional context section names the feature as '${context.match[1]}', but the description section names it as '${featureName}'. The same feature name must be used throughout the document.`,
-      `Rewrite the additional context line so it begins with '${featureName} is a feature that ...'.`
-    );
-  }
-  if (context && featureName && context.match[1] === featureName) {
-    state.pass(context.line, "The additional context section uses the same feature name as the description.");
+  if (state.section("### Description", `${type}.description_heading`)) {
+    state.expectParagraph(`${type}.description_paragraph`, "The '### Description' heading must be followed by a paragraph describing the playbook.");
+    // Further paragraphs and notes may follow the opening paragraph.
+    while (state.current() && !state.current().text.startsWith("#")) {
+      state.index += 1;
+    }
   }
 
-  // Demonstration checks ensure the feature can be understood in practice.
-  // A valid setup line, a valid configuration table, and at least one valid
-  // numbered step are all required for a passing outcome.
-  state.expectText("### Demonstration", "feature.demonstration_heading", "The next required section heading is '### Demonstration'.");
-  state.expect(
-    /^Set up .+ with the following configuration:$/,
-    "feature.setup_line",
-    "The setup line must be written exactly as 'Set up <environment> with the following configuration:'."
-  );
-  state.expectTable();
-
-  const stepsIntro = state.find(
-    /^Perform the following steps to enable (.+):$/,
-    "feature.steps_intro",
-    "The step introduction must be written exactly as 'Perform the following steps to enable <feature_name>:' and must appear after the demonstration setup."
-  );
-  if (stepsIntro && featureName && stepsIntro.match[1] !== featureName) {
-    state.error(
-      stepsIntro.line,
-      "feature.steps_feature_name",
-      `The demonstration introduction refers to '${stepsIntro.match[1]}', but the description section refers to '${featureName}'. The same feature name must be used throughout the document.`,
-      `Rewrite the line as 'Perform the following steps to enable ${featureName}:'.`
-    );
+  if (state.section("### Demonstration", `${type}.demonstration_heading`)) {
+    state.expectSteps(`${type}.steps`, STEP_TERMINATORS[type]);
   }
-  if (stepsIntro && featureName && stepsIntro.match[1] === featureName) {
-    state.pass(stepsIntro.line, "The demonstration introduction uses the same feature name as the description.");
-  }
+}
 
-  // This numbered-list check is intentionally broad about the action details
-  // while still requiring a predictable sentence shape for scalable review.
-  state.expectNumberedList(
-    /^(\d+)\. .+ to .+$/,
-    "feature.demo_steps",
-    "Each demonstration step must follow the approved format '1. <action_verb> to <objective>'.",
-    { allowImageLines: true }
-  );
-
-  const risksIntro = state.find(
-    /^Because the iOS platform provides (.+) feature, your app is at risk of:$/,
+function validateFeatureEnding(state, id) {
+  const intro = state.section(
+    STEP_TERMINATORS.feature,
     "feature.related_risks_intro",
-    "The related risks introduction must be written exactly as 'Because the iOS platform provides <feature_name> feature, your app is at risk of:' and must appear after the numbered demonstration steps."
+    "After the last step, the related risks introduction must be written as 'Because <reason>, your app is at risk of:'."
   );
-  if (risksIntro && featureName && risksIntro.match[1] !== featureName) {
-    state.error(
-      risksIntro.line,
-      "feature.related_risks_feature_name",
-      `The related risks section names the feature as '${risksIntro.match[1]}', but the description section names it as '${featureName}'. The same feature name must be used throughout the document.`,
-      `Rewrite the line as 'Because the iOS platform provides ${featureName} feature, your app is at risk of:'.`
-    );
-  }
-  if (risksIntro && featureName && risksIntro.match[1] === featureName) {
-    state.pass(risksIntro.line, "The related risks introduction uses the same feature name as the description.");
+  if (!intro) {
+    return;
   }
 
   state.expectBulletList(
-    /^- \[(ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))\]\((ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])\.md)\)$/,
+    /^- \[(ios-platform-feature-\d{2}-risk-\d{2})\]\((ios-platform-feature-\d{2}-risk-\d{2}\.md)\)$/,
     "feature.related_risks_list",
     "Each related risk entry must follow the approved format '- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)'.",
-    ({ item, match, parser }) => {
-      const riskId = match[1];
-      const linkedFile = match[4];
-      const expectedFile = `${riskId}.md`;
-
-      if (linkedFile !== expectedFile) {
-        parser.error(
-          item.line,
-          "feature.related_risks_link_match",
-          `The related risk entry labels this risk as '${riskId}', but links to '${linkedFile}'. The link target must match the risk identifier exactly.`,
-          `Rewrite the link as '- [${riskId}](${expectedFile})'.`
-        );
-        return false;
-      }
-
-      return true;
-    }
+    ({ item, match, parser }) => checkLinkedId(parser, item, match, id, "feature.related_risks_link_match", "risk")
   );
-  return state.diagnostics;
+  state.expectEnd("feature.extra_content", "The related risks list must be the last content in a feature playbook.");
 }
 
-function validateRiskFile(filePath, basename, items, passLogs) {
-  const state = createParser(filePath, items, passLogs);
-
-  // Risk playbooks describe how a platform feature could be misused and what
-  // harmful outcome that misuse could create. These checks keep that story
-  // complete, consistent, and easy to compare across many playbooks.
-  const heading = state.expect(
-    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9]))$/,
-    "risk.heading",
-    "The risk heading must be written exactly as '## ios-platform-feature-01-risk-01', where each numbered placeholder uses a two-digit value from 01 to 99."
+function validateRiskEnding(state, id) {
+  const [, featureNumber, riskNumber] = id.match(/^ios-platform-feature-(\d{2})-risk-(\d{2})$/);
+  const expectedIntro = `Feature-${featureNumber}-Risk-${riskNumber} control measures:`;
+  const intro = state.section(
+    STEP_TERMINATORS.risk,
+    "risk.controls_intro",
+    `After the last step, the control list introduction must be written exactly as '${expectedIntro}'.`
   );
-
-  const headingSlug = heading?.match[1] ?? null;
-  if (headingSlug && headingSlug !== basename) {
-    state.error(
-      heading.line,
-      "heading.filename_match",
-      `The top heading identifies this file as '${headingSlug}', but the filename is '${basename}.md'. These two identifiers must match so the document can be reviewed consistently.`,
-      `Rename the file to '${headingSlug}.md', or change the heading to '## ${basename}' so the heading and filename agree.`
-    );
+  if (!intro) {
+    return;
   }
-  if (headingSlug === basename) {
-    state.pass(heading.line, `The top heading matches the filename identifier '${headingSlug}'.`);
+  if (intro.text !== expectedIntro) {
+    state.error(intro.line, "risk.controls_intro_id", `The control list introduction reads '${intro.text}', but this risk is '${id}'.`, `Rewrite the line as '${expectedIntro}'.`);
   }
 
-  state.expectText("### Description", "risk.description_heading", "The next required section heading is '### Description'.");
-  const description = state.expectOneOf(
-    [
-      /^Because the iOS platform provides (.+) feature, your application is at risk of an attacker (.+)\.$/,
-      /^Because the iOS platform provides (.+) feature, your application$/,
-    ],
-    "risk.description_sentence",
-    "The risk description must follow the approved public template exactly."
+  state.expectBulletList(
+    /^- \[(ios-platform-feature-\d{2}-risk-\d{2}-control-\d{2})\]\((ios-platform-feature-\d{2}-risk-\d{2}-control-\d{2}\.md)\)$/,
+    "risk.controls_list",
+    "Each control entry must follow the approved format '- [ios-platform-feature-01-risk-01-control-01](ios-platform-feature-01-risk-01-control-01.md)'.",
+    ({ item, match, parser }) => checkLinkedId(parser, item, match, id, "risk.controls_link_match", "control")
   );
-  const featureName = description?.match[1] ?? null;
-  let technique = description?.match[2] ?? null;
 
-  if (description && !technique) {
-    const continuation = state.expect(
-      /^is at risk of an attacker (.+)\.$/,
-      "risk.description_continuation",
-      "When the risk description is split over two lines, the second line must be written exactly as 'is at risk of an attacker <technique>.'"
-    );
-    if (continuation) {
-      technique = continuation.match[1];
-    }
+  // Risk playbooks may close with the external references the demonstration
+  // relies on, such as MASTG techniques or MITRE ATT&CK tactics.
+  if (state.current()?.text === "References:") {
+    state.index += 1;
+    state.expectBulletList(/^- .*https?:\/\/\S+/, "risk.references_list", "Each reference entry must be a bullet containing a URL.");
   }
-  if (description) {
-    state.pass(description.line, "The risk description follows the approved public wording.");
-  }
-
-  // The goal section explains the consequence of the risk.
-  // The demonstration section shows the risk in action using a structured,
-  // repeatable format. Each missing or malformed part is a failure.
-  state.expectText("### Goal", "risk.goal_heading", "The next required section heading is '### Goal'.");
-  state.expect(
-    /^As a result, this could lead to .+$/,
-    "risk.goal_sentence",
-    "The goal sentence must begin with 'As a result, this could lead to ' and include a non-empty tactic or outcome description."
-  );
-  state.expectText("### Demonstration", "risk.demonstration_heading", "The next required section heading is '### Demonstration'.");
-  state.expect(
-    /^Set up .+ with the following configuration:$/,
-    "risk.setup_line",
-    "The setup line must be written exactly as 'Set up <environment> with the following configuration:'."
-  );
-  state.expectTable();
-
-  const stepsIntro = state.find(
-    /^Perform the following steps to demonstrate the risk of an attacker (.+):$/,
-    "risk.steps_intro",
-    "The step introduction must be written exactly as 'Perform the following steps to demonstrate the risk of an attacker <technique>:' and must appear after the demonstration setup."
-  );
-  if (stepsIntro && technique && stepsIntro.match[1] !== technique) {
-    state.error(
-      stepsIntro.line,
-      "risk.steps_technique",
-      `The demonstration introduction names the attacker technique as '${stepsIntro.match[1]}', but the description section names it as '${technique}'. The same technique must be used throughout the document.`,
-      `Rewrite the line as 'Perform the following steps to demonstrate the risk of an attacker ${technique}:'.`
-    );
-  }
-  if (stepsIntro && technique && stepsIntro.match[1] === technique) {
-    state.pass(stepsIntro.line, "The demonstration introduction uses the same attacker technique as the description.");
-  }
-
-  // The technique named in the demonstration must match the technique named in
-  // the description. This prevents public-facing documents from drifting into
-  // inconsistent attacker narratives.
-  state.expectNumberedList(
-    /^(\d+)\. .+ to .+$/,
-    "risk.demo_steps",
-    "Each demonstration step must follow the approved format '1. <action_verb> to <objective>'.",
-    { allowImageLines: true }
-  );
-  return state.diagnostics;
+  state.expectEnd("risk.extra_content", "The control list, optionally followed by 'References:' and a list of URLs, must be the last content in a risk playbook.");
 }
 
-function validateControlFile(filePath, basename, items, passLogs) {
-  const state = createParser(filePath, items, passLogs);
-
-  // Control playbooks are intentionally concise. They must identify the risk,
-  // provide a detection step, provide a prevention step, and point to the APK
-  // that demonstrates the control. Anything missing becomes a failure.
-  const heading = state.expect(
-    /^## (ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9]))$/,
-    "control.heading",
-    "The control heading must be written exactly as '## ios-platform-feature-01-risk-01-control-01', where each numbered placeholder uses a two-digit value from 01 to 99."
-  );
-
-  const headingSlug = heading?.match[1] ?? null;
-  if (headingSlug && headingSlug !== basename) {
+function validateControlEnding(state, filePath, id) {
+  const heading = state.section(STEP_TERMINATORS.control, "control.references_heading", "After the last step, the next required section heading is '### References'.");
+  if (!heading) {
+    return;
+  }
+  if (heading.text === "References:") {
     state.error(
       heading.line,
-      "heading.filename_match",
-      `The top heading identifies this file as '${headingSlug}', but the filename is '${basename}.md'. These two identifiers must match so the document can be reviewed consistently.`,
-      `Rename the file to '${headingSlug}.md', or change the heading to '## ${basename}' so the heading and filename agree.`
+      "control.references_heading",
+      "The references section must use the heading '### References', but the review found 'References:' instead.",
+      `Replace line ${heading.line} with '### References'.`
     );
   }
-  if (headingSlug === basename) {
-    state.pass(heading.line, `The top heading matches the filename identifier '${headingSlug}'.`);
+
+  state.expectBulletList(/^- .*https?:\/\/\S+/, "control.references_list", "Each reference entry must be a bullet containing a URL.");
+
+  const source = state.expect(
+    /^The source code with the implemented control can be found \[here\]\(control-examples\/([^)\s]+)\.zip\)\.$/,
+    "control.source_reference",
+    `The final line must be written exactly as 'The source code with the implemented control can be found [here](control-examples/${id}.zip).'.`
+  );
+  if (source) {
+    const archive = source.match[1];
+    const archivePath = path.join(path.dirname(filePath), "control-examples", `${archive}.zip`);
+    if (archive !== id) {
+      state.error(source.line, "control.source_archive_name", `The source code link points to '${archive}.zip', but this control is '${id}'.`, `Link to 'control-examples/${id}.zip' instead.`);
+    } else if (!fs.existsSync(archivePath)) {
+      state.error(source.line, "control.source_archive_exists", `The source code archive 'control-examples/${archive}.zip' does not exist next to this playbook.`, `Add the archive at '${path.relative(process.cwd(), archivePath)}'.`);
+    } else {
+      state.pass(source.line, `The source code archive 'control-examples/${archive}.zip' exists and matches the control identifier.`);
+    }
+  }
+  state.expectEnd("control.extra_content", "The source code line must be the last content in a control playbook.");
+}
+
+function checkLinkedId(parser, item, match, parentId, rule, childType) {
+  const linkedId = match[1];
+  const linkedFile = match[2];
+  const expectedFile = `${linkedId}.md`;
+
+  if (linkedFile !== expectedFile) {
+    parser.error(
+      item.line,
+      rule,
+      `The entry labels this ${childType} as '${linkedId}', but links to '${linkedFile}'. The link target must match the ${childType} identifier exactly.`,
+      `Rewrite the link as '- [${linkedId}](${expectedFile})'.`
+    );
+    return false;
   }
 
-  state.expect(
-    /^Your app can prevent the risk of an attacker (.+) by taking the following steps:$/,
-    "control.intro",
-    "The control introduction must be written exactly as 'Your app can prevent the risk of an attacker <technique> by taking the following steps:'."
-  );
-  state.expectNumberedList(
-    /^(\d+)\. .+$/,
-    "control.steps",
-    "Each control step must be a numbered item written as '1. <instructions>'."
-  );
-  state.find(
-    /^### References$/,
-    "control.references_heading",
-    "The references heading must be written exactly as '### References' and must appear after the numbered control steps."
-  );
-  state.find(
-    /^The IPA with the implemented control can be found \[here\]\((.+)\)\.$/,
-    "control.ipa_reference",
-    "The final reference line must be written exactly as 'The IPA with the implemented control can be found [here](path).'."
-  );
-  return state.diagnostics;
+  if (!linkedId.startsWith(`${parentId}-`)) {
+    parser.error(item.line, rule, `The ${childType} '${linkedId}' does not belong to '${parentId}'.`, `Link only to ${childType} playbooks whose identifier starts with '${parentId}-'.`);
+    return false;
+  }
+
+  return true;
 }
 
 function createParser(filePath, items, passLogs) {
@@ -507,129 +433,120 @@ function createParser(filePath, items, passLogs) {
         items.at(-1)?.line ?? 1,
         rule,
         `${message} The document ends before that required line appears.`,
-        "Add the missing line after the numbered demonstration steps so the document matches the approved feature format."
+        "Add the missing line in the required position so the document matches the approved format."
       );
-      return null;
-    },
-    // Variant matcher for cases where the public template permits one of a
-    // small number of exact phrasings, such as a sentence split over two lines.
-    expectOneOf(patterns, rule, message) {
-      const item = this.current();
-      if (!item) {
-        this.error(items.at(-1)?.line ?? 1, rule, `${message} The document ends before an approved version of this line appears.`, "Add the missing line in the required position so the document can continue through review.");
-        return null;
-      }
-
-      for (const pattern of patterns) {
-        const match = item.text.match(pattern);
-        if (match) {
-          this.index += 1;
-          this.pass(item.line, `${rule} passed.`);
-          return { ...item, match };
-        }
-      }
-
-      this.index += 1;
-      this.error(item.line, rule, `${message} The review found '${item.text}' on this line instead.`, `Replace line ${item.line} with wording that matches one of the approved template options.`);
       return null;
     },
     expectText(text, rule, message) {
       return this.expect(new RegExp(`^${escapeRegex(text)}$`), rule, message);
     },
-    // Required configuration-table check:
-    // - Pass: header is exact and separator is present.
-    // - Fail: missing table, wrong header, or too few rows.
-    //
-    // General Markdown table quality is also checked elsewhere by checkTables().
-    expectTable() {
-      const start = this.current();
-      if (!start || !start.text.startsWith("|")) {
+    // Section matcher:
+    // - Pass: the required line is next, or appears later after content that
+    //   does not belong there (which is reported, then skipped).
+    // - Fail: the required line never appears; the position does not move so
+    //   later sections can still be checked.
+    section(pattern, rule, message) {
+      const regex = typeof pattern === "string" ? new RegExp(`^${escapeRegex(pattern)}$`) : pattern;
+      const item = this.current();
+      const found = this.find(regex, rule, message ?? `The next required section heading is '${pattern}'.`);
+      if (found && item && found.line !== item.line) {
         this.error(
-          start?.line ?? items.at(-1)?.line ?? 1,
-          "table.missing",
-          "A configuration table is required immediately after the setup line, but no table appears in that position.",
-          "Add a table in that position with the exact header '| Configuration | Detail |' and a separator row."
+          item.line,
+          rule,
+          `${message ?? `The next required section heading is '${pattern}'.`} The review found '${item.text}' before it, which is not part of the approved layout.`,
+          `Remove the content between line ${item.line} and line ${found.line}, or move it into the section where it belongs.`
         );
-        return null;
       }
-
-      const tableLines = [];
-      while (this.current() && this.current().text.startsWith("|")) {
-        tableLines.push(this.current());
-        this.index += 1;
-      }
-
-      if (tableLines.length < 2) {
-        this.error(
-          start.line,
-          "table.row_count",
-          `The configuration table must contain at least 2 lines, but only ${tableLines.length} line(s) were found.`,
-          "Add the required header row and separator row."
-        );
-        return null;
-      }
-
-      const headerCells = parseTableCells(tableLines[0].text);
-      if (headerCells.length !== 2 || headerCells[0] !== "Configuration" || headerCells[1] !== "Detail") {
-        this.error(
-          tableLines[0].line,
-          "table.header",
-          `The configuration table header must be '| Configuration | Detail |', but the review found '${tableLines[0].text}' instead.`,
-          "Change the first row of the table to '| Configuration | Detail |'."
-        );
-        return null;
-      }
-
-      this.pass(tableLines[0].line, "The configuration table uses the approved header.");
-      this.pass(tableLines[1].line, "The configuration table includes a separator row.");
-      return tableLines;
+      return found;
     },
-    // Numbered-list check:
-    // - Pass: at least one numbered item exists and every item matches the rule.
-    // - Fail: the list is missing or any item breaks the agreed sentence pattern.
-    expectNumberedList(itemPattern, rule, message, options = {}) {
-      const { allowImageLines = false } = options;
+    // Like expect(), but a mismatch does not consume the line, so a missing
+    // paragraph does not swallow the heading that follows it.
+    expectContent(pattern, rule, message) {
+      const item = this.current();
+      if (item && pattern.test(item.text)) {
+        return this.expect(pattern, rule, message);
+      }
+
+      this.error(
+        item?.line ?? items.at(-1)?.line ?? 1,
+        rule,
+        item ? `${message} The review found '${item.text}' instead.` : `${message} The document ends before that content appears.`,
+        "Add the missing content in this position."
+      );
+      return null;
+    },
+    expectParagraph(rule, message) {
+      return this.expectContent(PARAGRAPH_PATTERN, rule, message);
+    },
+    // Demonstration step check:
+    // - Pass: '#### NN. <Heading>' steps numbered 01, 02, ... in order, each
+    //   with at least one paragraph of body text.
+    // - Fail: a malformed heading, a gap or repeat in the numbering, or a step
+    //   that only contains images, code, captions, lists or notes.
+    //
+    // A step body runs until the next heading or the terminator line that opens
+    // the closing section of the playbook.
+    expectSteps(rule, terminator) {
+      const isBoundary = (item) => /^#{1,4}(\s|$)/.test(item.text) || terminator.test(item.text);
+      const skipBody = () => {
+        let paragraphs = 0;
+        while (this.current() && !isBoundary(this.current())) {
+          if (PARAGRAPH_PATTERN.test(this.current().text)) {
+            paragraphs += 1;
+          }
+          this.index += 1;
+        }
+        return paragraphs;
+      };
+
       const start = this.current();
-      if (!start || !/^\d+\.\s+/.test(start.text)) {
+      if (!start || !/^####(\s|$)/.test(start.text)) {
         this.error(
           start?.line ?? items.at(-1)?.line ?? 1,
           rule,
-          `${message} A numbered list item was required at this point, but none was found.`,
-          "Add at least one numbered item that follows the required template."
+          start
+            ? `The demonstration must start with the step heading '#### 01. <Heading>', but the review found '${start.text}' instead.`
+            : "The demonstration must contain at least one step headed '#### 01. <Heading>', but the document ends first.",
+          "Break the demonstration into steps headed '#### 01. <Heading>', '#### 02. <Heading>', and so on."
         );
-        return null;
+        skipBody();
+        return 0;
       }
 
+      // After a gap the count follows the author's number, so one missing
+      // step is reported once rather than on every later step.
       let count = 0;
-      while (this.current()) {
-        const item = this.current();
-        if (/^\d+\.\s+/.test(item.text)) {
-          if (!itemPattern.test(item.text)) {
-            this.error(
-              item.line,
-              rule,
-              `${message} The review found '${item.text}' on this line instead.`,
-              `Rewrite line ${item.line} so it follows the required numbered-list format.`
-            );
-            return null;
-          }
+      while (this.current() && /^####(\s|$)/.test(this.current().text)) {
+        const heading = this.current();
+        const expected = String(count + 1).padStart(2, "0");
+        const match = heading.text.match(/^#### (\d{2})\. (\S.*)$/);
+        this.index += 1;
+        count = match ? Number(match[1]) : count + 1;
 
-          count += 1;
-          this.pass(item.line, `Numbered list item ${count} passed the '${rule}' review check.`);
-          this.index += 1;
-          continue;
+        if (!match) {
+          this.error(heading.line, rule, `Step headings must be written as '#### ${expected}. <Heading>', but the review found '${heading.text}'.`, `Rewrite line ${heading.line} as '#### ${expected}. <Heading>'.`);
+        } else if (match[1] !== expected) {
+          this.error(
+            heading.line,
+            rule,
+            `This step is numbered '${match[1]}', but step '${expected}' was expected. Steps must be numbered 01, 02, 03, ... in order with no gaps or repeats.`,
+            `Renumber this step heading as '#### ${expected}. ${match[2]}'.`
+          );
+        } else {
+          this.pass(heading.line, `Step ${expected} heading passed the '${rule}' review check.`);
         }
 
-        if (allowImageLines && /^<img\b.+>$/.test(item.text)) {
-          this.pass(item.line, `Supporting image line ${count > 0 ? `after item ${count}` : "within the list block"} is allowed for '${rule}'.`);
-          this.index += 1;
-          continue;
+        if (skipBody() === 0) {
+          this.error(
+            heading.line,
+            `${rule}_body`,
+            `Step '${heading.text}' has no paragraph of body text explaining what to do.`,
+            "Add at least one sentence under the step heading that explains the action and why it is taken."
+          );
         }
-
-        break;
       }
 
-      return true;
+      return count;
     },
     expectBulletList(itemPattern, rule, message, validateItem = null) {
       const start = this.current();
@@ -654,12 +571,14 @@ function createParser(filePath, items, passLogs) {
             `${message} The review found '${item.text}' on this line instead.`,
             `Rewrite line ${item.line} so it follows the required bullet-list format.`
           );
+          this.skipBullets();
           return null;
         }
 
         if (validateItem) {
           const isValid = validateItem({ item, match, parser: this });
           if (!isValid) {
+            this.skipBullets();
             return null;
           }
         }
@@ -670,6 +589,13 @@ function createParser(filePath, items, passLogs) {
       }
 
       return true;
+    },
+    // Moves past the rest of a bullet list after a failure so the list is not
+    // reported again as unexpected content.
+    skipBullets() {
+      while (this.current() && /^- /.test(this.current().text)) {
+        this.index += 1;
+      }
     },
     // End-of-document guard:
     // - Pass implicitly when no extra content remains.
@@ -689,17 +615,22 @@ function createParser(filePath, items, passLogs) {
 
 function inferTypeFromFilename(basename) {
   // Filename classification is strict because the filename determines which
-  // public template will be enforced next.
-  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])-control-(0[1-9]|[1-9][0-9])$/.test(basename)) {
-    return "control";
+  // public template will be enforced next. The returned id is the identifier
+  // the top heading must repeat.
+  const number = "(?:0[1-9]|[1-9][0-9])";
+  if (new RegExp(`^ios-platform-feature-${number}-risk-${number}-control-${number}$`).test(basename)) {
+    return { type: "control", id: basename };
   }
 
-  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])-risk-(0[1-9]|[1-9][0-9])$/.test(basename)) {
-    return "risk";
+  if (new RegExp(`^ios-platform-feature-${number}-risk-${number}$`).test(basename)) {
+    return { type: "risk", id: basename };
   }
 
-  if (/^ios-platform-feature-(0[1-9]|[1-9][0-9])$/.test(basename)) {
-    return "feature";
+  // A feature may have tool-specific variants, such as
+  // 'ios-platform-feature-01-iMazing.md', which share the feature identifier.
+  const feature = basename.match(new RegExp(`^(ios-platform-feature-${number})(?:-(?!risk$|control$)[A-Za-z][A-Za-z0-9_]*)?$`));
+  if (feature) {
+    return { type: "feature", id: feature[1] };
   }
 
   return null;
@@ -914,6 +845,104 @@ function checkTables(filePath, lines, passLogs) {
   return diagnostics;
 }
 
+function checkCodeFences(filePath, fenceIssues, passLogs) {
+  // A stray or unclosed fence flips everything after it between prose and
+  // code, which hides content from every other check.
+  if (fenceIssues.length === 0) {
+    passLogs.push(makePassLog(filePath, 1, "Every code fence in this document is properly opened and closed."));
+    return [];
+  }
+
+  return fenceIssues.map((issue) =>
+    issue.kind === "stray"
+      ? makeDiagnostic(
+          filePath,
+          issue.line,
+          "code.stray_fence",
+          `This code fence does not belong to a code block: the fence with a language at line ${issue.nextFenceLine} would otherwise be read as the end of a block that started here.`,
+          `Remove the stray fence at line ${issue.line}.`
+        )
+      : makeDiagnostic(
+          filePath,
+          issue.line,
+          "code.unclosed_fence",
+          "This code fence opens a code block that is never closed, so the rest of the document would be read as code.",
+          "Add a closing fence after the code block, or remove this fence if it is stray."
+        )
+  );
+}
+
+function checkCaptionsAndNotes(filePath, lines, codeBlocks, passLogs) {
+  const diagnostics = [];
+  const nextContent = (index) => {
+    for (let offset = index; offset < lines.length; offset += 1) {
+      if (lines[offset].trim()) {
+        return { text: lines[offset].trim(), line: offset + 1 };
+      }
+    }
+    return null;
+  };
+
+  // Every code block and image is followed by an italic caption so readers
+  // know what it shows without running the code or zooming the screenshot.
+  // Code block lines are blank here, so back-to-back blocks share a caption.
+  for (const block of codeBlocks) {
+    const caption = nextContent(block.end);
+    if (caption && /^\*Code block shows .+\*$/.test(caption.text)) {
+      passLogs.push(makePassLog(filePath, caption.line, "The code block is followed by a 'Code block shows' caption."));
+      continue;
+    }
+    diagnostics.push(
+      makeDiagnostic(
+        filePath,
+        block.start,
+        "caption.code_block",
+        `The code block starting here must be followed by an italic caption beginning '*Code block shows', but the review found ${caption ? `'${caption.text}'` : "the end of the document"} instead.`,
+        "Add a line such as '*Code block shows <what the code does>*' directly after the code block."
+      )
+    );
+  }
+
+  for (const [index, line] of lines.entries()) {
+    const text = line.trim();
+
+    if (/^(<img\b|!\[)/.test(text)) {
+      const caption = nextContent(index + 1);
+      if (caption && /^\*Screenshot shows .+\*$/.test(caption.text)) {
+        passLogs.push(makePassLog(filePath, caption.line, "The image is followed by a 'Screenshot shows' caption."));
+      } else {
+        diagnostics.push(
+          makeDiagnostic(
+            filePath,
+            index + 1,
+            "caption.screenshot",
+            `This image must be followed by an italic caption beginning '*Screenshot shows', but the review found ${caption ? `'${caption.text}'` : "the end of the document"} instead.`,
+            "Add a line such as '*Screenshot shows <what the image shows>*' directly after the image."
+          )
+        );
+      }
+      continue;
+    }
+
+    // Notes are block quotes that start with 'Note:'. Only the first line of
+    // a block quote is checked so a note may continue over several lines.
+    const startsQuote = text.startsWith(">") && !(lines[index - 1] ?? "").trim().startsWith(">");
+    if ((startsQuote && !/^> Note: \S/.test(text)) || /^(\*\*|_)?Note\b/i.test(text)) {
+      diagnostics.push(
+        makeDiagnostic(
+          filePath,
+          index + 1,
+          "note.format",
+          `Notes must be written as a block quote starting '> Note: ', but the review found '${text}'.`,
+          "Rewrite this line as '> Note: <note text>'."
+        )
+      );
+    }
+  }
+
+  return diagnostics;
+}
+
 function parseTableCells(line) {
   // Table parsing is intentionally simple because the supported playbook tables
   // are expected to be plain Markdown tables without advanced escaping rules.
@@ -926,19 +955,55 @@ function parseTableCells(line) {
 function splitMarkdownLinesIgnoringCodeBlocks(raw) {
   const lines = raw.split(/\r?\n/);
   const sanitizedLines = [];
-  let insideCodeBlock = false;
+  const codeBlocks = [];
+  const fenceIssues = [];
+  let open = null;
 
-  for (const line of lines) {
-    if (/^\s*```/.test(line)) {
-      sanitizedLines.push("");
-      insideCodeBlock = !insideCodeBlock;
+  // Code block content is blanked so that other checks ignore it, while the
+  // block positions are kept for the caption check.
+  //
+  // Following CommonMark, only a bare fence closes a block; a fence with a
+  // language such as '``` swift' can only open one. Seeing such a fence inside
+  // a block therefore means the fence that opened the block was stray. The
+  // stray fence is reported, the lines it swallowed are restored as prose, and
+  // the language fence opens the real block.
+  for (const [index, line] of lines.entries()) {
+    const fence = line.match(/^\s*(`{3,})\s*(.*)$/);
+
+    if (!open) {
+      sanitizedLines.push(fence ? "" : line);
+      if (fence) {
+        open = { start: index, ticks: fence[1].length };
+      }
       continue;
     }
 
-    sanitizedLines.push(insideCodeBlock ? "" : line);
+    sanitizedLines.push("");
+    if (!fence) {
+      continue;
+    }
+
+    if (fence[2] === "" && fence[1].length >= open.ticks) {
+      codeBlocks.push({ start: open.start + 1, end: index + 1 });
+      open = null;
+      continue;
+    }
+
+    fenceIssues.push({ line: open.start + 1, kind: "stray", nextFenceLine: index + 1 });
+    for (let restore = open.start + 1; restore < index; restore += 1) {
+      sanitizedLines[restore] = lines[restore];
+    }
+    open = { start: index, ticks: fence[1].length };
   }
 
-  return sanitizedLines;
+  if (open) {
+    fenceIssues.push({ line: open.start + 1, kind: "unclosed" });
+    for (let restore = open.start + 1; restore < lines.length; restore += 1) {
+      sanitizedLines[restore] = lines[restore];
+    }
+  }
+
+  return { lines: sanitizedLines, codeBlocks, fenceIssues };
 }
 
 function walkMarkdownFiles(rootDirectory) {

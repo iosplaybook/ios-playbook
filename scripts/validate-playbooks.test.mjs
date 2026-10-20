@@ -8,465 +8,408 @@ import path from "node:path";
 const repoRoot = process.cwd();
 const scriptPath = path.join(repoRoot, "scripts", "validate-playbooks.mjs");
 
-test("feature playbooks accept a post-demonstration related risks section", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
+const FEATURE = [
+  "## ios-platform-feature-01",
+  "",
+  "### Title",
+  "",
+  "Secure Storage",
+  "",
+  "### Description",
+  "",
+  "Secure Storage protects application secrets stored on the device.",
+  "",
+  "### Demonstration",
+  "#### 01. Prepare the environment",
+  "",
+  "Set up the required environment with:",
+  "* An iPhone running the demo app",
+  "",
+  "#### 02. Enable encrypted storage",
+  "",
+  "Open the project settings and enable encrypted storage.",
+  "",
+  "Because Secure Storage keeps secrets on the device, your app is at risk of:",
+  "",
+  "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
+];
 
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Secure Storage is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "| Build variant | Debug |",
-      "",
-      "Perform the following steps to enable Secure Storage:",
-      "",
-      "1. Open the project settings to enable encrypted storage",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
+const RISK = [
+  "## ios-platform-feature-01-risk-01",
+  "",
+  "### Title",
+  "",
+  "Extract stored secrets",
+  "",
+  "### Description",
+  "",
+  "Extract secrets from the app container on a compromised device.",
+  "",
+  "A finding means a secret was recovered in plaintext.",
+  "",
+  "### Demonstration",
+  "#### 01. Locate the container",
+  "",
+  "Open the backup directory to locate the exported application data.",
+  "",
+  "Feature-01-Risk-01 control measures:",
+  "",
+  "- [ios-platform-feature-01-risk-01-control-01](ios-platform-feature-01-risk-01-control-01.md)",
+];
 
-  const result = runValidator([filePath]);
+const CONTROL = [
+  "## ios-platform-feature-01-risk-01-control-01",
+  "",
+  "### Title",
+  "",
+  "Store secrets in the Keychain",
+  "",
+  "### Description",
+  "",
+  "Store secrets in the Keychain instead of the app container.",
+  "",
+  "### Demonstration",
+  "#### 01. Store secrets in the Keychain",
+  "",
+  "Save the token with `SecItemAdd` so it never reaches the container.",
+  "",
+  "``` swift",
+  "SecItemAdd(query as CFDictionary, nil)",
+  "```",
+  "",
+  "*Code block shows storing a token in the Keychain*",
+  "",
+  "### References",
+  "",
+  "- https://developer.apple.com/documentation/security/keychain_services",
+  "",
+  "The source code with the implemented control can be found [here](control-examples/ios-platform-feature-01-risk-01-control-01.zip).",
+];
 
-  fs.rmSync(tempRoot, { recursive: true, force: true });
+test("the example pass playbooks are accepted without warnings", () => {
+  const files = fs.readdirSync(path.join(repoRoot, "examples", "pass")).filter((name) => name.endsWith(".md"));
+  const result = runValidator(files.map((name) => path.join("examples", "pass", name)));
 
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /feature\.related_risks_intro/);
-  assert.match(result.stdout, /feature\.related_risks_list/);
+  assert.equal(result.status, 0, result.stdout);
+  assert.doesNotMatch(result.stdout, /::warning/);
+  assert.match(result.stdout, /Step 03 heading passed the 'feature\.steps'/);
+  assert.match(result.stdout, /The source code archive 'control-examples\/ios-platform-feature-01-risk-01-control-01\.zip' exists/);
 });
 
-test("required table structure accepts two rows and proceeds to the next feature check", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Secure Storage is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "",
-      "Perform the following steps to enable Secure Storage:",
-      "",
-      "1. Open the project settings to enable encrypted storage",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /The configuration table uses the approved header/);
-  assert.match(result.stdout, /The configuration table includes a separator row/);
-  assert.doesNotMatch(result.stdout, /includes at least one data row/);
-  assert.match(result.stdout, /feature\.steps_intro/);
-});
-
-test("each numbered demonstration step is validated for a feature playbook", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Secure Storage is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "",
-      "Perform the following steps to enable Secure Storage:",
-      "",
-      "1. Open the project settings to enable encrypted storage",
-      "2. Update the app configuration to store secrets in the encrypted container",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /Numbered list item 1 passed the 'feature\.demo_steps'/);
-  assert.match(result.stdout, /Numbered list item 2 passed the 'feature\.demo_steps'/);
-});
-
-test("feature playbooks allow image lines between numbered demonstration steps", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Secure Storage is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "",
-      "Perform the following steps to enable Secure Storage:",
-      "",
-      "1. Open the project settings to enable encrypted storage",
-      "",
-      "<img src=\"../assets/feature-step-1.png\" width=\"400\" alt=\"Alt text\">",
-      "",
-      "2. Update the app configuration to store secrets in the encrypted container",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /feature\.demo_steps/);
-  assert.match(result.stdout, /Supporting image line after item 1 is allowed for 'feature\.demo_steps'/);
-});
-
-test("the validator reports multiple feature issues from one file", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Wrong Name is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "Perform the following steps to enable Another Name:",
-      "",
-      "Do the thing now",
-      "",
-      "Because the iOS platform provides Wrong Name feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-02.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
+test("the example fail playbooks report each seeded problem", () => {
+  const files = fs.readdirSync(path.join(repoRoot, "examples", "fail")).filter((name) => name.endsWith(".md"));
+  const result = runValidator(files.map((name) => path.join("examples", "fail", name)));
 
   assert.equal(result.status, 1);
-  assert.match(result.stdout, /feature\.additional_context_feature_name/);
-  assert.match(result.stdout, /table\.missing/);
-  assert.match(result.stdout, /feature\.steps_feature_name/);
-  assert.match(result.stdout, /feature\.demo_steps/);
-  assert.match(result.stdout, /feature\.related_risks_feature_name/);
-  assert.match(result.stdout, /feature\.related_risks_link_match/);
+  for (const rule of [
+    "placeholder.unreplaced",
+    "feature.title_line",
+    "feature.steps",
+    "feature.steps_body",
+    "caption.screenshot",
+    "caption.code_block",
+    "note.format",
+    "feature.related_risks_link_match",
+    "code.unclosed_fence",
+    "control.references_heading",
+    "control.source_archive_name",
+  ]) {
+    assert.match(result.stdout, new RegExp(`\\[${rule.replace(".", "\\.")}\\]`), `expected ${rule}`);
+  }
+  assert.doesNotMatch(result.stdout, /extra_content/);
 });
 
-test("control playbooks accept multiple numbered steps", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01-control-01.md");
+test("feature, risk and control playbooks in the new layout pass", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": FEATURE,
+    "ios-platform-feature-01-risk-01.md": RISK,
+    "ios-platform-feature-01-risk-01-control-01.md": CONTROL,
+    "control-examples/ios-platform-feature-01-risk-01-control-01.zip": "zip",
+  });
 
-  fs.writeFileSync(
-    filePath,
-    [
+  assert.equal(result.status, 0, result.stdout);
+  assert.match(result.stdout, /feature\.related_risks_list/);
+  assert.match(result.stdout, /risk\.controls_list/);
+  assert.match(result.stdout, /control\.source_reference/);
+});
+
+test("feature tool variants share the feature identifier", () => {
+  const result = validate({ "ios-platform-feature-01-iMazing.md": FEATURE });
+
+  assert.equal(result.status, 0, result.stdout);
+  assert.match(result.stdout, /The top heading matches the filename identifier 'ios-platform-feature-01'/);
+});
+
+test("the top heading must match the filename", () => {
+  const result = validate({ "ios-platform-feature-02.md": FEATURE });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /heading\.filename_match/);
+});
+
+test("steps must be numbered 01, 02, ... and a gap is reported once", () => {
+  const lines = replace(FEATURE, "#### 02. Enable encrypted storage", "#### 03. Enable encrypted storage");
+  const result = validate({ "ios-platform-feature-01.md": [...lines.slice(0, -4), "#### 04. Verify", "", "Check the setting.", "", ...lines.slice(-4)] });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /This step is numbered '03', but step '02' was expected/);
+  assert.doesNotMatch(result.stdout, /numbered '04'/);
+});
+
+test("step headings must use the '#### NN. <Heading>' form", () => {
+  const result = validate({ "ios-platform-feature-01.md": replace(FEATURE, "#### 02. Enable encrypted storage", "#### 2 Enable encrypted storage") });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[feature\.steps\] Step headings must be written as '#### 02\. <Heading>'/);
+});
+
+test("each step needs a paragraph of body text", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": replace(FEATURE, "Open the project settings and enable encrypted storage.", [
+      '<img src="assets/step.png" width="400" alt="Settings">',
+      "",
+      "*Screenshot shows the settings screen*",
+    ]),
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[feature\.steps_body\] Step '#### 02\. Enable encrypted storage' has no paragraph/);
+});
+
+test("the title must be one line and the description must open with a paragraph", () => {
+  const withLongTitle = replace(FEATURE, "Secure Storage", ["Secure Storage", "on iOS"]);
+  const withoutParagraph = replace(FEATURE, "Secure Storage protects application secrets stored on the device.", "> Note: Only test apps you own.");
+  const result = validate({ "ios-platform-feature-01.md": withLongTitle });
+  const second = validate({ "ios-platform-feature-01.md": withoutParagraph });
+
+  assert.match(result.stdout, /\[feature\.title_line\] The title must be a single line/);
+  assert.doesNotMatch(result.stdout, /\[feature\.description_heading\]/);
+  assert.match(second.stdout, /\[feature\.description_paragraph\]/);
+});
+
+test("code blocks and images need 'Code block shows' and 'Screenshot shows' captions", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": replace(FEATURE, "Open the project settings and enable encrypted storage.", [
+      "Open the project settings and enable encrypted storage.",
+      "",
+      "```bash",
+      "defaults write demo encrypted -bool true",
+      "```",
+      "",
+      "*Command shows enabling the setting*",
+      "",
+      '<img src="assets/step.png" width="400" alt="Settings">',
+      "",
+      "Next, restart the app.",
+    ]),
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[caption\.code_block\].*'\*Command shows enabling the setting\*'/);
+  assert.match(result.stdout, /\[caption\.screenshot\].*'Next, restart the app\.'/);
+});
+
+test("notes must be written as '> Note:' block quotes", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": replace(FEATURE, "Open the project settings and enable encrypted storage.", [
+      "Open the project settings and enable encrypted storage.",
+      "",
+      "> Note: Restart the app afterwards.",
+      "> The setting is read at launch.",
+      "",
+      "**Note:** Back up the device first.",
+      "",
+      "> Tip: Use a test device.",
+    ]),
+  });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout.match(/\[note\.format\]/g).length, 2);
+  assert.match(result.stdout, /found '\*\*Note:\*\* Back up the device first\.'/);
+  assert.match(result.stdout, /found '> Tip: Use a test device\.'/);
+});
+
+test("feature playbooks must end with the related risks list", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": [
+      ...replace(FEATURE, "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)", "- [ios-platform-feature-02-risk-01](ios-platform-feature-02-risk-01.md)"),
+      "",
+      "Trailing text.",
+    ],
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[feature\.related_risks_link_match\] The risk 'ios-platform-feature-02-risk-01' does not belong to 'ios-platform-feature-01'/);
+  assert.equal(result.stdout.match(/\[feature\.extra_content\]/g).length, 1);
+  assert.match(result.stdout, /\[feature\.extra_content\].*'Trailing text\.'/);
+});
+
+test("risk playbooks accept a trailing 'References:' list after the controls", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01.md": [...RISK, "", "References:", "", "- https://mas.owasp.org/MASTG/techniques/ios/MASTG-TECH-0053/"],
+  });
+
+  assert.equal(result.status, 0, result.stdout);
+  assert.match(result.stdout, /risk\.references_list/);
+});
+
+test("risk control list introduction must name this risk", () => {
+  const result = validate({ "ios-platform-feature-01-risk-01.md": replace(RISK, "Feature-01-Risk-01 control measures:", "Feature-01-Risk-02 control measures:") });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[risk\.controls_intro_id\]/);
+});
+
+test("controls must use '### References', not 'References:'", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": replace(CONTROL, "### References", "References:"),
+    "control-examples/ios-platform-feature-01-risk-01-control-01.zip": "zip",
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[control\.references_heading\] The references section must use the heading '### References', but the review found 'References:'/);
+});
+
+test("controls must link an existing source archive named after the control", () => {
+  const missing = validate({ "ios-platform-feature-01-risk-01-control-01.md": CONTROL });
+  const misnamed = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": CONTROL.map((line) => line.replace("control-01.zip", "control-02.zip")),
+    "control-examples/ios-platform-feature-01-risk-01-control-02.zip": "zip",
+  });
+
+  assert.equal(missing.status, 1);
+  assert.match(missing.stdout, /\[control\.source_archive_exists\]/);
+  assert.equal(misnamed.status, 1);
+  assert.match(misnamed.stdout, /\[control\.source_archive_name\]/);
+});
+
+test("controls need a references list before the source code line", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": CONTROL.filter((line) => !line.startsWith("- https://")),
+    "control-examples/ios-platform-feature-01-risk-01-control-01.zip": "zip",
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[control\.references_list\]/);
+});
+
+test("playbooks still in the old sentence template get a single layout failure", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": [
       "## ios-platform-feature-01-risk-01-control-01",
       "",
       "Your app can prevent the risk of an attacker extracting secrets by taking the following steps:",
       "",
       "1. Detect suspicious access patterns in secure storage calls.",
       "",
-      "2. Prevent secret exposure with device-bound encryption checks.",
-      "",
-      "3. Prevent static extraction by obfuscating generated secret material.",
-      "",
       "### References",
       "",
       "The IPA with the implemented control can be found [here](https://example.com/control.ipa).",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
+    ],
+  });
 
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /Numbered list item 1 passed the 'control\.steps'/);
-  assert.match(result.stdout, /Numbered list item 2 passed the 'control\.steps'/);
-  assert.match(result.stdout, /Numbered list item 3 passed the 'control\.steps'/);
-  assert.match(result.stdout, /control\.references_heading/);
-  assert.match(result.stdout, /control\.ipa_reference/);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout.match(/::error/g).length, 1);
+  assert.match(result.stdout, /\[structure\.layout\]/);
 });
 
-test("risk playbooks allow additional content after the numbered demonstration steps", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
+test("a stray fence after a code block is reported without hiding later content", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": replace(CONTROL, "*Code block shows storing a token in the Keychain*", [
+      "```",
+      "",
+      "*Code block shows storing a token in the Keychain*",
+      "",
+      "#### 02. Read the token back",
+      "",
+      "Read the token with `SecItemCopyMatching` when it is needed.",
+      "",
+      "``` swift",
+      "SecItemCopyMatching(query as CFDictionary, &item)",
+      "```",
+      "",
+      "*Code block shows reading the token from the Keychain*",
+    ]),
+    "control-examples/ios-platform-feature-01-risk-01-control-01.zip": "zip",
+  });
 
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01-risk-01",
-      "",
-      "### Description",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your application is at risk of an attacker extracting secrets.",
-      "",
-      "### Goal",
-      "",
-      "As a result, this could lead to credential disclosure.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "| Build variant | Debug |",
-      "",
-      "Perform the following steps to demonstrate the risk of an attacker extracting secrets:",
-      "",
-      "1. Open the backup directory to locate the exported application data",
-      "",
-      "Additional notes about the demonstration can appear here.",
-      "A follow-up paragraph is also allowed.",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /risk\.demo_steps/);
-  assert.doesNotMatch(result.stdout, /risk\.extra_content/);
+  const strayLine = CONTROL.indexOf("*Code block shows storing a token in the Keychain*") + 1;
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, new RegExp(`line=${strayLine},.*\\[code\\.stray_fence\\]`));
+  assert.equal(result.stdout.match(/::error/g).length, 1, result.stdout);
+  assert.match(result.stdout, /Step 02 heading passed/);
 });
 
-test("risk playbooks allow image lines between numbered demonstration steps", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
+test("an unclosed fence is reported", () => {
+  const result = validate({
+    "ios-platform-feature-01-risk-01-control-01.md": CONTROL.filter((line, index) => !(line === "```" && CONTROL[index - 1].startsWith("SecItemAdd"))),
+    "control-examples/ios-platform-feature-01-risk-01-control-01.zip": "zip",
+  });
 
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01-risk-01",
-      "",
-      "### Description",
-      "",
-      "Because the iOS platform provides Secure Storage feature, your application is at risk of an attacker extracting secrets.",
-      "",
-      "### Goal",
-      "",
-      "As a result, this could lead to credential disclosure.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "| Build variant | Debug |",
-      "",
-      "Perform the following steps to demonstrate the risk of an attacker extracting secrets:",
-      "",
-      "1. Open the backup directory to locate the exported application data",
-      "",
-      "<img src=\"../assets/risk-step-1.png\" width=\"400\" alt=\"Alt text\">",
-      "",
-      "2. Inspect the exported bundle to identify embedded secrets",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /risk\.demo_steps/);
-  assert.match(result.stdout, /Supporting image line after item 1 is allowed for 'risk\.demo_steps'/);
-});
-
-test("risk goal sentences allow emphasized tactics with a short explanation", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01-risk-01",
-      "",
-      "### Description",
-      "",
-      "Because the iOS platform provides IPA Acquisition feature, your application is at risk of an attacker extracting the IPA file.",
-      "",
-      "### Goal",
-      "",
-      "As a result, this could lead to _**discovery** - attackers figuring out the IPA's vulnerabilities._",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "| Build variant | Debug |",
-      "",
-      "Perform the following steps to demonstrate the risk of an attacker extracting the IPA file:",
-      "",
-      "1. Open the device backup directory to locate the generated IPA file",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
-
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
-  assert.match(result.stdout, /risk\.goal_sentence/);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[code\.unclosed_fence\]/);
 });
 
 test("format checks ignore fenced Markdown code blocks", () => {
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
-  const filePath = path.join(tempRoot, "ios-platform-feature-01.md");
-  const linkedRiskPath = path.join(tempRoot, "ios-platform-feature-01-risk-01.md");
-
-  fs.writeFileSync(linkedRiskPath, "# placeholder\n", "utf8");
-
-  fs.writeFileSync(
-    filePath,
-    [
-      "## ios-platform-feature-01",
-      "",
-      "### Description",
-      "",
-      "The iOS platform provides Secure Storage feature.",
-      "",
-      "### Additional context",
-      "",
-      "Secure Storage is a feature that protects application secrets stored on the device.",
-      "",
-      "### Demonstration",
-      "",
-      "Set up demo app with the following configuration:",
-      "",
-      "| Configuration | Detail |",
-      "| -------- | ------- |",
-      "",
-      "Perform the following steps to enable Secure Storage:",
-      "",
-      "1. Open the project settings to enable encrypted storage",
+  const result = validate({
+    "ios-platform-feature-01.md": replace(FEATURE, "Open the project settings and enable encrypted storage.", [
+      "Open the project settings and enable encrypted storage.",
       "",
       "```md",
       "{feature_name}",
       "- [broken](missing.md)",
       "| Bad | Table |",
-      "2. This numbered line inside code block should be ignored",
+      "#### 03. This heading inside a code block should be ignored",
       "```",
       "",
-      "Because the iOS platform provides Secure Storage feature, your app is at risk of:",
-      "",
-      "- [ios-platform-feature-01-risk-01](ios-platform-feature-01-risk-01.md)",
-      "",
-    ].join("\n"),
-    "utf8"
-  );
+      "*Code block shows template text that must not be validated*",
+    ]),
+    "ios-platform-feature-01-risk-01.md": RISK,
+  });
 
-  const result = runValidator([filePath]);
-
-  fs.rmSync(tempRoot, { recursive: true, force: true });
-
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 0, result.stdout);
   assert.doesNotMatch(result.stdout, /placeholder\./);
-  assert.doesNotMatch(result.stdout, /link\.internal_exists/);
+  assert.doesNotMatch(result.stdout, /missing\.md/);
   assert.doesNotMatch(result.stdout, /table\.markdown_/);
-  assert.doesNotMatch(result.stdout, /Numbered list item 2 passed the 'feature\.demo_steps'/);
+  assert.doesNotMatch(result.stdout, /Step 03 heading/);
 });
+
+test("hygiene checks still apply", () => {
+  const result = validate({
+    "ios-platform-feature-01.md": replace(FEATURE, "Open the project settings and enable encrypted storage.", [
+      "Open the project settings and enable encrypted storage. ",
+      "",
+      "| Setting | Value |",
+      "| Encrypted | Yes |",
+    ]),
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /whitespace\.trailing/);
+  assert.match(result.stdout, /table\.separator/);
+});
+
+// Writes the given files into a temporary playbooks directory and validates
+// every Markdown file in it.
+function validate(files) {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ios-playbook-validator-"));
+  try {
+    for (const [name, content] of Object.entries(files)) {
+      const filePath = path.join(tempRoot, name);
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, Array.isArray(content) ? `${content.join("\n")}\n` : content, "utf8");
+    }
+    return runValidator(Object.keys(files).filter((name) => name.endsWith(".md")).map((name) => path.join(tempRoot, name)));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+function replace(lines, target, replacement) {
+  const index = lines.indexOf(target);
+  assert.notEqual(index, -1, `fixture line not found: ${target}`);
+  return [...lines.slice(0, index), ...[replacement].flat(), ...lines.slice(index + 1)];
+}
 
 function runValidator(filePaths) {
   return spawnSync(process.execPath, [scriptPath, "--stdin"], {

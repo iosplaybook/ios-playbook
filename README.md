@@ -63,7 +63,7 @@ The following review phases are implemented:
 
 Format validation is a blocking check. The GitHub Models review phases provide advisory feedback and run after the format validator passes. Their scripts require a `GITHUB_TOKEN` with access to GitHub Models.
 
-The format validator currently enforces the earlier template illustrated in `examples/pass/`. It does not yet accept all current entry layouts or the tool suffixes used by the IPA retrieval variants.
+The format validator enforces the Title / Description / Demonstration layout with `#### NN.` steps illustrated in `examples/pass/`, including step captions, `> Note:` notes, the closing risk or control links, and the control source code archive. Feature files may carry a tool suffix, such as `ios-platform-feature-01-iMazing.md`.
 
 Run the local reviews from the repository root:
 
