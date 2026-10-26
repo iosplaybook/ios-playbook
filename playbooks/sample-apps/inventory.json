@@ -1,0 +1,46 @@
+{
+  "reviewed_on": "2026-10-21",
+  "binary_paths_relative_to": "mobile_playbook_automation repository root",
+  "scope": "Custom risk-test intake binaries, companion helpers and the Demo Bank manual-test fixture. Third-party production apps and the synthetic example_app.ipa placeholder are excluded.",
+  "samples": [
+    {
+      "binary": "artifacts/companion/ios/ipas/LocalKeyboard.ipa",
+      "binary_sha256": "3f17ea272dede86441a0d062900479fe67c845cff671f24d27a4eeb84cdaabce",
+      "package": "com.example.LocalKeyboard",
+      "risks": [
+        "ios-feature-04-risk-01"
+      ],
+      "source_status": "available",
+      "archive": "ios-platform-feature-04-risk-01-local-keyboard-source.zip",
+      "archive_sha256": "e1b599b378c57e309be6fa1e362312c9025808266329261dce17503795277533",
+      "note": "Pre-existing source archive; preserved as supplied. Its identity and build equivalence to the reference IPA were not revalidated."
+    },
+    {
+      "binary": "artifacts/companion/ios/ipas/ReplayConsentRecorder.ipa",
+      "binary_sha256": "ebaf23de6a45ca2070de435ea7f3f564019af785f5fabb6e1375fea9fe53a00c",
+      "package": "com.example.ReplayConsentRecorder",
+      "risks": [
+        "ios-feature-03-risk-01"
+      ],
+      "source_status": "available",
+      "archive": "ios-platform-feature-03-risk-01-replay-consent-recorder-source.zip",
+      "archive_sha256": "2843ff85e8cb5f0af94fd72b57ec6e06eb5adf11dd1354d8a37ae2fe32bcfd23",
+      "note": "Source: iosplaybook_sideload/ScreenRecording, including current local evidence-export changes. Freshly extracted archive builds for the simulator with signing disabled; device signing and ReplayKit runtime operation were not tested."
+    },
+    {
+      "binary": "artifacts/intake/ios/JailbreakLab-1.0.ipa",
+      "binary_sha256": "305d80c14df34ea6d7dc1c61d50f2dda3c17fc4a0c03637a8dde14adebf343ca",
+      "package": "com.mobileplaybook.JailbreakLab",
+      "risks": [
+        "ios-feature-05-risk-01",
+        "ios-feature-05-risk-02",
+        "ios-feature-05-risk-03",
+        "ios-feature-05-risk-04"
+      ],
+      "source_status": "available",
+      "archive": "ios-platform-feature-05-jailbreak-lab-source.zip",
+      "archive_sha256": "47c8d69705545d9dab18f9c283d261f57e764f4971fcc2986e6ced0d5c326d74",
+      "note": "Pre-existing archive; every archived source file matches artifacts/intake/ios/fixtures/jailbreak-lab-1.0. The fixture copy of the IPA has the same checksum."
+    }
+  ]
+}
